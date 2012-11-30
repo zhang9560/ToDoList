@@ -11,9 +11,10 @@ public class ViewPagerMainAdapter extends FragmentPagerAdapter {
     public ViewPagerMainAdapter(FragmentManager fm, Context context) {
         super(fm);
 
-        mFragments = new Fragment[2];
+        mFragments = new Fragment[3];
         mFragments[0] = Fragment.instantiate(context, TaskListFragment.class.getName(), null);
         mFragments[1] = Fragment.instantiate(context, TaskListFragment.class.getName(), null);
+        mFragments[2] = Fragment.instantiate(context, TaskListFragment.class.getName(), null);
     }
 
     @Override

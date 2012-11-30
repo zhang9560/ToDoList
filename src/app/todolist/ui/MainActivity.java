@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuInflater;
 import app.todolist.R;
 import app.todolist.data.ViewPagerMainAdapter;
 
@@ -26,6 +28,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         // Add action bar and navigation tabs.
         mActionBar = getActionBar();
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setDisplayShowHomeEnabled(false);
+        mActionBar.setDisplayShowTitleEnabled(false);
 
         ActionBar.Tab taskTreeTab = mActionBar.newTab();
         taskTreeTab.setText(R.string.task_tree);
@@ -36,11 +40,23 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         listViewTab.setText(R.string.list_view);
         listViewTab.setTabListener(this);
         mActionBar.addTab(listViewTab);
+
+        ActionBar.Tab tagsTab = mActionBar.newTab();
+        tagsTab.setText(R.string.tags);
+        tagsTab.setTabListener(this);
+        mActionBar.addTab(tagsTab);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_menu, menu);
+        return true;
     }
 
     @Override
