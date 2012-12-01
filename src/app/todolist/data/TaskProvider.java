@@ -20,6 +20,21 @@ public class TaskProvider extends ContentProvider {
 
     // Columns for all the tables.
     public static final String KEY_ID = "_id";
+    public static final String KEY_COMMENTS = "COMMENTS";
+    public static final String KEY_COMMENT_STYLE = "COMMENTSTYLE";
+    public static final String KEY_CUSTOM_COMMENTS = "CUSTOMCOMMENTS";
+    public static final String KEY_TITLE = "TITLE";
+    public static final String KEY_PRIORITY = "PRIORITY";
+    public static final String KEY_PERCENTDONE = "PERCENTDONE";
+    public static final String KEY_CREATION_DATE = "CREATIONDATE";
+    public static final String KEY_LAST_MOD = "LASTMOD";
+    public static final String KEY_START_DATE = "STARTDATE";
+    public static final String KEY_DUE_DATE = "DUEDATE";
+    public static final String KEY_DONE_DATE = "DONEDATE";
+    public static final String KEY_TASK_ID = "ID";
+    public static final String KEY_PROJECT_NAME = "PROJECTNAME";
+    public static final String KEY_FILE_NAME = "FILENAME";
+    public static final String KEY_TAG_NAME = "NAME";
 
     public static final Uri CONTENT_URI = Uri.parse("content://app.todolist.provider");
     public static final Uri TASK_URI = Uri.withAppendedPath(CONTENT_URI, TASKS_TABLE);
