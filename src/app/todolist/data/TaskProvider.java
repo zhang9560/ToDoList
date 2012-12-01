@@ -148,7 +148,6 @@ public class TaskProvider extends ContentProvider {
                 qBuilder.setTables(TAGS_TABLE);
                 break;
             default:
-                db.close();
                 return null;
         }
 
@@ -157,7 +156,6 @@ public class TaskProvider extends ContentProvider {
             cursor.setNotificationUri(getContext().getContentResolver(), uri);
         }
 
-        db.close();
         return cursor;
     }
 
@@ -186,13 +184,10 @@ public class TaskProvider extends ContentProvider {
                 retUri  = TAG_URI;
                 break;
             default:
-                db.close();
                 return null;
         }
 
         long rowId = db.insert(table, null, values);
-        db.close();
-
         if (rowId == -1) { // Something error occurred.
             return null;
         } else {
@@ -223,14 +218,10 @@ public class TaskProvider extends ContentProvider {
                 table = TAGS_TABLE;
                 break;
             default:
-                db.close();
                 return 0;
         }
 
-        int count = db.delete(table, whereClause, selectionArgs);
-        db.close();
-
-        return count;
+        return db.delete(table, whereClause, selectionArgs);
     }
 
     @Override
@@ -256,14 +247,10 @@ public class TaskProvider extends ContentProvider {
                 table = TAGS_TABLE;
                 break;
             default:
-                db.close();
                 return 0;
         }
 
-        int count = db.update(table, values, whereClause, selectionArgs);
-        db.close();
-
-        return count;
+        return db.update(table, values, whereClause, selectionArgs);
     }
 
     private SQLiteOpenHelper mOpenHelper;

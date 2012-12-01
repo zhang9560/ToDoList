@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.support.v13.app.FragmentPagerAdapter;
 import app.todolist.ui.TaskListFragment;
+import app.todolist.ui.TaskTreeFragment;
 
 public class ViewPagerMainAdapter extends FragmentPagerAdapter {
 
@@ -12,7 +13,7 @@ public class ViewPagerMainAdapter extends FragmentPagerAdapter {
         super(fm);
 
         mFragments = new Fragment[3];
-        mFragments[0] = Fragment.instantiate(context, TaskListFragment.class.getName(), null);
+        mFragments[0] = Fragment.instantiate(context, TaskTreeFragment.class.getName(), null);
         mFragments[1] = Fragment.instantiate(context, TaskListFragment.class.getName(), null);
         mFragments[2] = Fragment.instantiate(context, TaskListFragment.class.getName(), null);
     }
