@@ -18,6 +18,9 @@ public class TaskProvider extends ContentProvider {
     public static final String LISTS_TABLE = "lists";
     public static final String TAGS_TABLE = "tags";
 
+    // Columns for all the tables.
+    public static final String KEY_ID = "_id";
+
     public static final Uri CONTENT_URI = Uri.parse("content://app.todolist.provider");
     public static final Uri TASK_URI = Uri.withAppendedPath(CONTENT_URI, TASKS_TABLE);
     public static final Uri LIST_URI = Uri.withAppendedPath(CONTENT_URI, LISTS_TABLE);
@@ -111,27 +114,35 @@ public class TaskProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
-        Cursor cursor = null;
+        Cursor cursor;
 
         switch (sUriMatcher.match(uri)) {
+            case TASK_ID:
+                qBuilder.appendWhere(KEY_ID + "=" + uri.getLastPathSegment());
             case TASKS:
                 qBuilder.setTables(TASKS_TABLE);
-                cursor = qBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
-            case TASK_ID:
-                break;
-            case LISTS:
                 break;
             case LIST_ID:
-                break;
-            case TAGS:
+                qBuilder.appendWhere(KEY_ID + "=" + uri.getLastPathSegment());
+            case LISTS:
+                qBuilder.setTables(LISTS_TABLE);
                 break;
             case TAG_ID:
+                qBuilder.appendWhere(KEY_ID + "=" + uri.getLastPathSegment());
+            case TAGS:
+                qBuilder.setTables(TAGS_TABLE);
                 break;
+            default:
+                db.close();
+                return null;
         }
 
+        cursor = qBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
         if (cursor != null) {
             cursor.setNotificationUri(getContext().getContentResolver(), uri);
         }
+
+        db.close();
         return cursor;
     }
 
@@ -142,17 +153,102 @@ public class TaskProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        return null;
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        String table;
+        Uri retUri;
+
+        switch (sUriMatcher.match(uri)) {
+            case TASKS:
+                table = TASKS_TABLE;
+                retUri = TASK_URI;
+                break;
+            case LISTS:
+                table = LISTS_TABLE;
+                retUri = LIST_URI;
+                break;
+            case TAGS:
+                table = TAGS_TABLE;
+                retUri  = TAG_URI;
+                break;
+            default:
+                db.close();
+                return null;
+        }
+
+        long rowId = db.insert(table, null, values);
+        db.close();
+
+        if (rowId == -1) { // Something error occurred.
+            return null;
+        } else {
+            return Uri.withAppendedPath(retUri, String.valueOf(rowId));
+        }
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        String whereClause = selection;
+        String table;
+
+        switch (sUriMatcher.match(uri)) {
+            case TASK_ID:
+                whereClause = KEY_ID + "=" + uri.getLastPathSegment();
+            case TASKS:
+                table = TASKS_TABLE;
+                break;
+            case LIST_ID:
+                whereClause = KEY_ID + "=" + uri.getLastPathSegment();
+            case LISTS:
+                table = LISTS_TABLE;
+                break;
+            case TAG_ID:
+                whereClause = KEY_ID + "=" + uri.getLastPathSegment();
+            case TAGS:
+                table = TAGS_TABLE;
+                break;
+            default:
+                db.close();
+                return 0;
+        }
+
+        int count = db.delete(table, whereClause, selectionArgs);
+        db.close();
+
+        return count;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        String whereClause = selection;
+        String table;
+
+        switch (sUriMatcher.match(uri)) {
+            case TASK_ID:
+                whereClause = KEY_ID + "=" + uri.getLastPathSegment();
+            case TASKS:
+                table = TASKS_TABLE;
+                break;
+            case LIST_ID:
+                whereClause = KEY_ID + "=" + uri.getLastPathSegment();
+            case LISTS:
+                table = LISTS_TABLE;
+                break;
+            case TAG_ID:
+                whereClause = KEY_ID + "=" + uri.getLastPathSegment();
+            case TAGS:
+                table = TAGS_TABLE;
+                break;
+            default:
+                db.close();
+                return 0;
+        }
+
+        int count = db.update(table, values, whereClause, selectionArgs);
+        db.close();
+
+        return count;
     }
 
     private SQLiteOpenHelper mOpenHelper;

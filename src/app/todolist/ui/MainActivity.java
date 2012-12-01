@@ -3,6 +3,7 @@ package app.todolist.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
@@ -46,8 +47,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         tagsTab.setText(R.string.tags);
         tagsTab.setTabListener(this);
         mActionBar.addTab(tagsTab);
-
-        getContentResolver().query(TaskProvider.CONTENT_URI, null, null, null, null);
     }
 
     @Override
