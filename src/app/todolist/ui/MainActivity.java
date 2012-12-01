@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import app.todolist.R;
+import app.todolist.data.TaskProvider;
 import app.todolist.data.ViewPagerMainAdapter;
 
 public class MainActivity extends Activity implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
@@ -45,6 +46,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         tagsTab.setText(R.string.tags);
         tagsTab.setTabListener(this);
         mActionBar.addTab(tagsTab);
+
+        getContentResolver().query(TaskProvider.CONTENT_URI, null, null, null, null);
     }
 
     @Override
