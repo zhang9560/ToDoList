@@ -32,6 +32,9 @@ public class TaskProvider extends ContentProvider {
     public static final String KEY_DUE_DATE = "DUEDATE";
     public static final String KEY_DONE_DATE = "DONEDATE";
     public static final String KEY_TASK_ID = "ID";
+    public static final String KEY_LIST_ID = "LISTID";
+    public static final String KEY_PARENT_ID = "PARENTID";
+    public static final String KEY_TAG_ID = "TAGID";
     public static final String KEY_PROJECT_NAME = "PROJECTNAME";
     public static final String KEY_FILE_NAME = "FILENAME";
     public static final String KEY_TAG_NAME = "NAME";

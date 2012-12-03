@@ -22,7 +22,7 @@
             android:maxWidth="300dip"
             android:textAppearance="?android:textAppearanceMedium" />
         <TextView
-            android:id="@+id/subtask_number"
+            android:id="@+id/subtask_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:textAppearanceMedium" />

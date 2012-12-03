@@ -13,6 +13,7 @@ import app.todolist.data.TaskProvider;
 import app.todolist.data.TaskTreeAdapter;
 
 public class TaskTreeFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +28,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), TaskProvider.TAG_URI, null, null, null, null);
+        return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, null, null, null);
     }
 
     @Override
