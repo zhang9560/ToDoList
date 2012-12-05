@@ -1,48 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="60dip"
               android:minHeight="50dip"
-              android:gravity="center_vertical">
+              android:gravity="center_vertical"
+              android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:orientation="horizontal">
+        android:layout_weight="8">
         <ImageView
             android:id="@+id/task_priority_img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="12dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"/>
         <TextView
             android:id="@+id/task_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="13dip"
-            android:maxWidth="300dip"
+            android:layout_toRightOf="@id/task_priority_img"
+            android:layout_toLeftOf="@+id/subtask_count"
+            android:singleLine="true"
             android:textAppearance="?android:textAppearanceMedium" />
         <TextView
-            android:id="@+id/subtask_count"
+            android:id="@id/subtask_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:textAppearance="?android:textAppearanceMedium" />
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_weight="2"
+        android:paddingRight="8dip"
+        android:gravity="center_vertical|right"
         android:orientation="vertical">
         <TextView
             android:id="@+id/task_due_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:singleLine="true"
             android:textAppearance="?android:textAppearanceSmall" />
         <TextView
             android:id="@+id/task_tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:singleLine="true"
             android:textAppearance="?android:textAppearanceSmall" />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
