@@ -48,13 +48,13 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="3dip"
             android:singleLine="true"
-            android:textSize="11sp" />
+            android:textSize="10sp" />
         <TextView
             android:id="@+id/task_tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:textSize="11sp" />
+            android:textSize="10sp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -11,7 +11,7 @@ import android.widget.TextView;
 import app.todolist.R;
 import app.todolist.utils.JOleDateTime;
 
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 public class TaskTreeAdapter extends CursorAdapter {
 
@@ -60,7 +60,7 @@ public class TaskTreeAdapter extends CursorAdapter {
         double dateTime = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));
         if(dateTime > 0) {
             JOleDateTime dueDate = new JOleDateTime(dateTime);
-            holder.dueDate.setText(String.format("%d/%d/%d", dueDate.get(Calendar.MONTH), dueDate.get(Calendar.DAY_OF_MONTH), dueDate.get(Calendar.YEAR)));
+            holder.dueDate.setText(sDueDateFormat.format(dueDate.getTime()));
         }
     }
 
@@ -90,6 +90,8 @@ public class TaskTreeAdapter extends CursorAdapter {
                 return R.drawable.priority_none;
         }
     }
+
+    protected static final SimpleDateFormat sDueDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private Context mContext;
 }
