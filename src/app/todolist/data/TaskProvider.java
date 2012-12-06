@@ -178,15 +178,12 @@ public class TaskProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case TASKS:
                 table = TASKS_TABLE;
-                retUri = TASK_URI;
                 break;
             case LISTS:
                 table = LISTS_TABLE;
-                retUri = LIST_URI;
                 break;
             case TAGS:
                 table = TAGS_TABLE;
-                retUri  = TAG_URI;
                 break;
             default:
                 return null;
@@ -196,7 +193,9 @@ public class TaskProvider extends ContentProvider {
         if (rowId == -1) { // Something error occurred.
             return null;
         } else {
-            return Uri.withAppendedPath(retUri, String.valueOf(rowId));
+            retUri = Uri.withAppendedPath(uri, String.valueOf(rowId));
+            getContext().getContentResolver().notifyChange(retUri, null);
+            return retUri;
         }
     }
 
@@ -226,7 +225,9 @@ public class TaskProvider extends ContentProvider {
                 return 0;
         }
 
-        return db.delete(table, whereClause, selectionArgs);
+        int count = db.delete(table, whereClause, selectionArgs);
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 
     @Override
@@ -255,7 +256,9 @@ public class TaskProvider extends ContentProvider {
                 return 0;
         }
 
-        return db.update(table, values, whereClause, selectionArgs);
+        int count = db.update(table, values, whereClause, selectionArgs);
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 
     private SQLiteOpenHelper mOpenHelper;

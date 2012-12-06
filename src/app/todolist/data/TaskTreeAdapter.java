@@ -47,7 +47,8 @@ public class TaskTreeAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // Put task's ID into the view's tag
-        view.setTag(R.id.tag_key_task_id, cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_TASK_ID)));
+        view.setTag(R.id.tag_key_task_id, cursor.getLong(cursor.getColumnIndex(TaskProvider.KEY_TASK_ID)));
+        view.setTag(R.id.tag_key_has_subtask, false);
 
         ViewHolder holder = (ViewHolder)view.getTag();
         holder.priority.setImageResource(priority2Res(cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PRIORITY))));
@@ -55,11 +56,14 @@ public class TaskTreeAdapter extends CursorAdapter {
         holder.tags.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));
 
         int subtaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_SUBTASK_COUNT));
+        holder.subtaskCount.setText(null); // Clear content.
         if (subtaskCount > 0) {
+            view.setTag(R.id.tag_key_has_subtask, true);
             holder.subtaskCount.setText(String.format("(%d)", subtaskCount));
         }
 
         double dateTime = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));
+        holder.dueDate.setText(null); // Clear content.
         if(dateTime > 0) {
             JOleDateTime dueDate = new JOleDateTime(dateTime);
             holder.dueDate.setText(sDueDateFormat.format(dueDate.getTime()));
@@ -76,6 +80,10 @@ public class TaskTreeAdapter extends CursorAdapter {
                 return R.drawable.priority_1;
             case 2:
                  return R.drawable.priority_2;
+            case 3:
+                return R.drawable.priority_3;
+            case 4:
+                return R.drawable.priority_4;
             case 5:
                 return R.drawable.priority_5;
             case 6:

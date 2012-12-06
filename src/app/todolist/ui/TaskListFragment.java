@@ -21,6 +21,6 @@ public class TaskListFragment extends ListFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_activity_menu, menu);
         // Don't show add task menu in action bar.
-        menu.getItem(0).setVisible(false);
+        menu.findItem(R.id.main_activity_menu_add_task).setVisible(false);
     }
 }

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/main_activity_menu_up"
+          android:icon="@drawable/ic_menu_up"
+          android:visible="false"
+          android:enabled="false"
+          android:showAsAction="always" />
     <item android:id="@+id/main_activity_menu_add_task"
           android:icon="@drawable/ic_menu_add_task"
           android:showAsAction="always" />
