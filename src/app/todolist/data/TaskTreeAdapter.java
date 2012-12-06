@@ -46,8 +46,10 @@ public class TaskTreeAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder holder = (ViewHolder)view.getTag();
+        // Put task's ID into the view's tag
+        view.setTag(R.id.tag_key_task_id, cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_TASK_ID)));
 
+        ViewHolder holder = (ViewHolder)view.getTag();
         holder.priority.setImageResource(priority2Res(cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PRIORITY))));
         holder.title.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE)));
         holder.tags.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));

@@ -6,8 +6,11 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.ListView;
 import app.todolist.R;
 import app.todolist.data.TaskProvider;
 import app.todolist.data.TaskTreeAdapter;
@@ -49,6 +52,11 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onListItemClick(ListView listView, View item, int position, long id) {
+        Log.d("TaskTreeFragment[onListItemClick]", "position = " + position + "task id = " + item.getTag(R.id.tag_key_task_id));
     }
 
     private TaskTreeAdapter mAdapter;
