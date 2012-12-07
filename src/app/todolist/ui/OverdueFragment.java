@@ -45,7 +45,7 @@ public class OverdueFragment extends ListFragment implements LoaderManager.Loade
         JOleDateTime dateTime = new JOleDateTime();
         long today = (long)dateTime.getDateTime();
 
-        String where = String.format("%s < %d", TaskProvider.KEY_DUE_DATE, today);
+        String where = String.format("%s < %d and %s > 0", TaskProvider.KEY_DUE_DATE, today, TaskProvider.KEY_DUE_DATE);
         String order = String .format("%s desc, %s desc", TaskProvider.KEY_DUE_DATE, TaskProvider.KEY_PRIORITY);
         return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, where, null, order);
     }

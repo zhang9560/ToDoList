@@ -20,6 +20,12 @@
                   android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
                   android:configChanges="orientation|screenSize" />
 
+        <activity android:name=".ui.EditTaskActivity"
+                  android:label="@string/edit_task"
+                  android:screenOrientation="fullSensor"
+                  android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+                  android:configChanges="orientation|screenSize" />
+
         <provider android:name=".data.TaskProvider"
                   android:authorities="app.todolist.provider" />
 

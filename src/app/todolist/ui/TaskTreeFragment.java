@@ -3,17 +3,18 @@ package app.todolist.ui;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import app.todolist.R;
 import app.todolist.data.TaskProvider;
@@ -29,7 +30,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        // Parent id is 0 means the top level tasks.
+        //Parent id is 0 means the top level tasks.
         mParentIdStack.push(0L);
     }
 
@@ -37,6 +38,23 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
+        registerForContextMenu(getListView());
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getActivity().getMenuInflater().inflate(R.menu.task_tree_list_context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.edit_task:
+                AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+                Log.d(TAG, "task id = " + menuInfo.id);
+                break;
+        }
+        return true;
     }
 
     @Override
@@ -98,15 +116,11 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public void onListItemClick(ListView listView, View item, int position, long id) {
-        long taskId = Long.valueOf(item.getTag(R.id.tag_key_task_id).toString());
-        boolean hasSubtask = Boolean.valueOf(item.getTag(R.id.tag_key_has_subtask).toString());
-        Log.d(TAG, "[onListItemClick] task id = " + taskId + ", has subtask = " + hasSubtask);
+        Log.d(TAG, "[onListItemClick] task id = " + id);
 
-        if (hasSubtask) {
-            mParentIdStack.push(taskId);
-            getLoaderManager().restartLoader(0, null, this);
-            getActivity().invalidateOptionsMenu();
-        }
+        mParentIdStack.push(id);
+        getLoaderManager().restartLoader(0, null, this);
+        getActivity().invalidateOptionsMenu();
     }
 
     private TaskTreeAdapter mAdapter;

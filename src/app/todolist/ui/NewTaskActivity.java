@@ -2,6 +2,8 @@ package app.todolist.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.FragmentTransaction;
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +23,11 @@ public class NewTaskActivity extends Activity {
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        mTaskInfoFragment = new TaskInfoFragment();
+        fragmentTransaction.add(android.R.id.content,mTaskInfoFragment);
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -33,6 +40,9 @@ public class NewTaskActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.new_task_activity_menu_done:
+                ContentValues values = mTaskInfoFragment.getContentValues();
+                values.put(TaskProvider.KEY_PARENT_ID, mParentId);
+                getContentResolver().insert(TaskProvider.TASK_URI, values);
                 setResult(RESULT_OK);
                 finish();
                 return true;
@@ -48,4 +58,5 @@ public class NewTaskActivity extends Activity {
     }
 
     private long mParentId;
+    private TaskInfoFragment mTaskInfoFragment;
 }

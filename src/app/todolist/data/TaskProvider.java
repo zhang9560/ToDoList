@@ -31,7 +31,6 @@ public class TaskProvider extends ContentProvider {
     public static final String KEY_START_DATE = "STARTDATE";
     public static final String KEY_DUE_DATE = "DUEDATE";
     public static final String KEY_DONE_DATE = "DONEDATE";
-    public static final String KEY_TASK_ID = "ID";
     public static final String KEY_LIST_ID = "LISTID";
     public static final String KEY_PARENT_ID = "PARENTID";
     public static final String KEY_TAGS = "TAGS";
@@ -68,7 +67,6 @@ public class TaskProvider extends ContentProvider {
             "tasks " +
             "(" +
             "_id integer primary key, " +
-            "ID integer, " +
             "TITLE text, " +
             "COMMENTS text, " +
             "COMMENTSTYLE text, " +

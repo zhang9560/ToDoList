@@ -47,10 +47,6 @@ public class TaskTreeAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        // Put task's ID into the view's tag
-        view.setTag(R.id.tag_key_task_id, cursor.getLong(cursor.getColumnIndex(TaskProvider.KEY_TASK_ID)));
-        view.setTag(R.id.tag_key_has_subtask, false);
-
         ViewHolder holder = (ViewHolder)view.getTag();
         holder.priority.setImageResource(priority2Res(cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PRIORITY))));
         holder.title.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE)));
@@ -58,11 +54,8 @@ public class TaskTreeAdapter extends CursorAdapter {
 
         int subtaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_SUBTASK_COUNT));
         holder.subtaskCount.setText(null); // Clear content.
-        if (subtaskCount > 0) {
-            view.setTag(R.id.tag_key_has_subtask, true);
-            if (mShowSubtaskCount) {
-                holder.subtaskCount.setText(String.format("(%d)", subtaskCount));
-            }
+        if (subtaskCount > 0 && mShowSubtaskCount) {
+            holder.subtaskCount.setText(String.format("(%d)", subtaskCount));
         }
 
         double dateTime = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));

@@ -3,13 +3,9 @@ package app.todolist.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuInflater;
 import app.todolist.R;
-import app.todolist.data.TaskProvider;
 import app.todolist.data.ViewPagerMainAdapter;
 
 public class MainActivity extends Activity implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
