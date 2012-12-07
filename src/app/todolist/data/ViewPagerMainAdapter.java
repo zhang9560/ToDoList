@@ -4,8 +4,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.support.v13.app.FragmentPagerAdapter;
-import app.todolist.ui.TagListFragment;
-import app.todolist.ui.TaskListFragment;
+import app.todolist.ui.OverdueFragment;
+import app.todolist.ui.UpcomingFragment;
 import app.todolist.ui.TaskTreeFragment;
 
 public class ViewPagerMainAdapter extends FragmentPagerAdapter {
@@ -15,8 +15,8 @@ public class ViewPagerMainAdapter extends FragmentPagerAdapter {
 
         mFragments = new Fragment[3];
         mFragments[0] = Fragment.instantiate(context, TaskTreeFragment.class.getName(), null);
-        mFragments[1] = Fragment.instantiate(context, TaskListFragment.class.getName(), null);
-        mFragments[2] = Fragment.instantiate(context, TagListFragment.class.getName(), null);
+        mFragments[1] = Fragment.instantiate(context, UpcomingFragment.class.getName(), null);
+        mFragments[2] = Fragment.instantiate(context, OverdueFragment.class.getName(), null);
     }
 
     @Override

@@ -64,7 +64,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, "PARENTID=" + mParentIdStack.peek(), null, null);
+        return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, TaskProvider.KEY_PARENT_ID + "=" + mParentIdStack.peek(), null, null);
     }
 
     @Override

@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import app.todolist.R;
 
-public class TagListFragment extends ListFragment {
+public class OverdueFragment extends ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

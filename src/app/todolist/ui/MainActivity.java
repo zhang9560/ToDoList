@@ -34,17 +34,17 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         mActionBar.setDisplayShowTitleEnabled(false);
 
         ActionBar.Tab taskTreeTab = mActionBar.newTab();
-        taskTreeTab.setText(R.string.task_tree);
+        taskTreeTab.setText(R.string.all);
         taskTreeTab.setTabListener(this);
         mActionBar.addTab(taskTreeTab);
 
         ActionBar.Tab listViewTab = mActionBar.newTab();
-        listViewTab.setText(R.string.list_view);
+        listViewTab.setText(R.string.upcoming);
         listViewTab.setTabListener(this);
         mActionBar.addTab(listViewTab);
 
         ActionBar.Tab tagsTab = mActionBar.newTab();
-        tagsTab.setText(R.string.tags);
+        tagsTab.setText(R.string.overdue);
         tagsTab.setTabListener(this);
         mActionBar.addTab(tagsTab);
     }
