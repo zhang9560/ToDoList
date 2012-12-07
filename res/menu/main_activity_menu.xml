@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/main_activity_menu_up"
-          android:icon="@drawable/ic_menu_up"
+    <item android:id="@+id/main_activity_menu_back"
+          android:icon="@drawable/ic_menu_back"
           android:visible="false"
-          android:enabled="false"
-          android:showAsAction="always" />
+          android:showAsAction="ifRoom" />
     <item android:id="@+id/main_activity_menu_add_task"
           android:icon="@drawable/ic_menu_add_task"
-          android:showAsAction="always" />
+          android:showAsAction="ifRoom" />
     <item android:id="@+id/main_activity_menu_search"
           android:icon="@drawable/ic_menu_search"
-          android:showAsAction="always" />
+          android:showAsAction="ifRoom" />
     <item android:id="@+id/main_activity_menu_select_list"
           android:icon="@drawable/ic_menu_select_list"
-          android:showAsAction="always" />
+          android:showAsAction="ifRoom" />
 </menu>

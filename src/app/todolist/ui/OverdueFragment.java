@@ -18,6 +18,5 @@ public class OverdueFragment extends ListFragment {
         inflater.inflate(R.menu.main_activity_menu, menu);
         // Don't display add task and search menu in action bar.
         menu.findItem(R.id.main_activity_menu_add_task).setVisible(false);
-        menu.findItem(R.id.main_activity_menu_search).setVisible(false);
     }
 }

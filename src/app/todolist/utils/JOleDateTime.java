@@ -27,6 +27,12 @@ public class JOleDateTime extends GregorianCalendar {
         setDateTime(dateTime);
     }
 
+    @Override
+    public void add(int field, int value) {
+        super.add(field, value);
+        init();
+    }
+
     public void setDateTime(double dateTime) {
         mDateTime = dateTime;
 
@@ -70,6 +76,14 @@ public class JOleDateTime extends GregorianCalendar {
         set(year, month, dayOfMoth, hoursOfDay, minutesOfHour);
     }
 
+    public double getDateTime() {
+        return mDateTime;
+    }
+
+    public String stringValue() {
+        return String.format("%.8f", mDateTime);
+    }
+
     private void init() {
         double totalDays = 1.0;
         int year = get(YEAR);
@@ -84,10 +98,6 @@ public class JOleDateTime extends GregorianCalendar {
 
         double minutes = get(HOUR_OF_DAY) * 60 + get(MINUTE);
         mDateTime = totalDays + minutes / (24 * 60);
-    }
-
-    public String stringValue() {
-        return String.format("%.8f", mDateTime);
     }
 
     private double mDateTime;

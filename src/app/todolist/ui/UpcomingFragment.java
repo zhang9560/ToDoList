@@ -13,6 +13,9 @@ import android.widget.ListView;
 import app.todolist.R;
 import app.todolist.data.TaskProvider;
 import app.todolist.data.TaskTreeAdapter;
+import app.todolist.utils.JOleDateTime;
+
+import java.util.Calendar;
 
 public class UpcomingFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     @Override
@@ -41,13 +44,21 @@ public class UpcomingFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, null, null, null);
+        JOleDateTime dateTime = new JOleDateTime();
+        long today = (long)dateTime.getDateTime();
+
+        dateTime.add(Calendar.DAY_OF_YEAR, 7); // In one week
+        long end = (long)dateTime.getDateTime();
+
+        String where = String.format("%s >= %d and %s < %d", TaskProvider.KEY_DUE_DATE, today, TaskProvider.KEY_DUE_DATE, end, TaskProvider.KEY_SUBTASK_COUNT);
+        String order = String .format("%s asc, %s desc", TaskProvider.KEY_DUE_DATE, TaskProvider.KEY_PRIORITY);
+        return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, where, null, order);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         if (mAdapter == null) {
-            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0);
+            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0, false);
             setListAdapter(mAdapter);
         } else {
             mAdapter.swapCursor(cursor);

@@ -40,19 +40,18 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_activity_menu, menu);
 
-        MenuItem upItem = menu.findItem(R.id.main_activity_menu_up);
+        MenuItem backItem = menu.findItem(R.id.main_activity_menu_back);
         if (mParentIdStack.peek() > 0) {
-            upItem.setEnabled(true);
+            backItem.setVisible(true);
         } else {
-            upItem.setEnabled(false);
+            backItem.setVisible(false);
         }
-        upItem.setVisible(true);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.main_activity_menu_up:
+            case R.id.main_activity_menu_back:
                 mParentIdStack.pop();
                 getLoaderManager().restartLoader(0, null, this);
                 getActivity().invalidateOptionsMenu();
@@ -70,7 +69,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (mAdapter == null) {
-            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0);
+            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0, true);
             setListAdapter(mAdapter);
         } else {
             mAdapter.swapCursor(cursor);

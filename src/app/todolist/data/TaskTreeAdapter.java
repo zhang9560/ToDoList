@@ -23,10 +23,11 @@ public class TaskTreeAdapter extends CursorAdapter {
         TextView tags;
     }
 
-    public TaskTreeAdapter(Context context, Cursor c, int flags) {
+    public TaskTreeAdapter(Context context, Cursor c, int flags, boolean showSubtaskCount) {
         super(context, c, flags);
 
         mContext = context;
+        mShowSubtaskCount = showSubtaskCount;
     }
 
     @Override
@@ -59,7 +60,9 @@ public class TaskTreeAdapter extends CursorAdapter {
         holder.subtaskCount.setText(null); // Clear content.
         if (subtaskCount > 0) {
             view.setTag(R.id.tag_key_has_subtask, true);
-            holder.subtaskCount.setText(String.format("(%d)", subtaskCount));
+            if (mShowSubtaskCount) {
+                holder.subtaskCount.setText(String.format("(%d)", subtaskCount));
+            }
         }
 
         double dateTime = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));
@@ -104,4 +107,5 @@ public class TaskTreeAdapter extends CursorAdapter {
     protected static final SimpleDateFormat sDueDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private Context mContext;
+    private boolean mShowSubtaskCount;
 }
