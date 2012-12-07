@@ -5,7 +5,7 @@
           android:icon="@drawable/ic_menu_back"
           android:visible="false"
           android:showAsAction="ifRoom" />
-    <item android:id="@+id/main_activity_menu_add_task"
+    <item android:id="@+id/main_activity_menu_new_task"
           android:icon="@drawable/ic_menu_add_task"
           android:showAsAction="ifRoom" />
     <item android:id="@+id/main_activity_menu_search"

@@ -34,7 +34,7 @@ public class UpcomingFragment extends ListFragment implements LoaderManager.Load
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_activity_menu, menu);
         // Don't show add task menu in action bar.
-        menu.findItem(R.id.main_activity_menu_add_task).setVisible(false);
+        menu.findItem(R.id.main_activity_menu_new_task).setVisible(false);
     }
 
     @Override

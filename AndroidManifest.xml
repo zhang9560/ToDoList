@@ -14,6 +14,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.NewTaskActivity"
+                  android:label="@string/new_task"
+                  android:screenOrientation="fullSensor"
+                  android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
+                  android:configChanges="orientation|screenSize" />
+
         <provider android:name=".data.TaskProvider"
                   android:authorities="app.todolist.provider" />
 

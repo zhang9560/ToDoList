@@ -1,8 +1,11 @@
 package app.todolist.ui;
 
+import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -56,9 +59,21 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
                 getLoaderManager().restartLoader(0, null, this);
                 getActivity().invalidateOptionsMenu();
                 break;
+            case R.id.main_activity_menu_new_task:
+                Intent intent = new Intent(getActivity(), NewTaskActivity.class);
+                intent.putExtra(TaskProvider.KEY_PARENT_ID, mParentIdStack.peek());
+                startActivityForResult(intent, 0);
+                break;
         }
 
         return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            getLoaderManager().restartLoader(0, null, this);
+        }
     }
 
     @Override
