@@ -14,7 +14,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import app.todolist.R;
-import app.todolist.data.PriorityArrayAdapter;
+import app.todolist.data.PrioritySpinnerAdapter;
 import app.todolist.data.TaskProvider;
 import app.todolist.utils.JOleDateTime;
 
@@ -22,6 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class TaskInfoFragment extends Fragment implements View.OnClickListener {
+
+    public static final String COMMENT_STYLE_PLAIN_TEXT = "PLAIN_TEXT";
+    public static final String COMMENT_STYLE_RICH_TEXT = "849cf988-79fe-418a-a40d-01fe3afcab2c";
 
     private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
@@ -47,8 +50,10 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.task_info, null);
         mTitle = (EditText)view.findViewById(R.id.task_info_title);
+        mComments = (EditText)view.findViewById(R.id.task_info_comments);
         mPrioritySpinner = (Spinner)view.findViewById(R.id.task_info_priority);
-        mPrioritySpinner.setAdapter(new PriorityArrayAdapter(getActivity()));
+        mTagsSpinner = (Spinner)view.findViewById(R.id.task_info_tags);
+        mPrioritySpinner.setAdapter(new PrioritySpinnerAdapter(getActivity()));
         mDueDateBtn = (Button)view.findViewById(R.id.task_info_due_date);
         mDueDateBtn.setOnClickListener(this);
 
@@ -65,9 +70,14 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put(TaskProvider.KEY_TITLE, mTitle.getText().toString());
+        values.put(TaskProvider.KEY_COMMENTS, mComments.getText().toString());
+        values.put(TaskProvider.KEY_COMMENT_STYLE, mCommentStyle);
         values.put(TaskProvider.KEY_LIST_ID, 1);
         values.put(TaskProvider.KEY_DUE_DATE, mDueDate);
+        values.put(TaskProvider.KEY_START_DATE, mStartDate);
+        values.put(TaskProvider.KEY_CREATION_DATE, mCreationDate);
         values.put(TaskProvider.KEY_PRIORITY, mPrioritySpinner.getSelectedItemId());
+        values.put(TaskProvider.KEY_PERCENTDONE, mPercentDone);
 
         return values;
     }
@@ -75,7 +85,13 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     protected static final SimpleDateFormat sDueDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private EditText mTitle;
+    private EditText mComments;
     private Spinner mPrioritySpinner;
+    private Spinner mTagsSpinner;
     private Button mDueDateBtn;
     private double mDueDate = 0;
+    private double mStartDate = 0;
+    private double mCreationDate = new JOleDateTime().getDateTime();
+    private String mCommentStyle = COMMENT_STYLE_PLAIN_TEXT;
+    private int mPercentDone = 0;
 }

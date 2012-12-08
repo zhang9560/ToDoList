@@ -9,8 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import app.todolist.R;
 
-public class PriorityArrayAdapter extends BaseAdapter {
-    public PriorityArrayAdapter(Context context) {
+public class PrioritySpinnerAdapter extends BaseAdapter {
+    public PrioritySpinnerAdapter(Context context) {
         mContext = context;
         mPriorityTitles = context.getResources().getStringArray(R.array.priority_array);
     }

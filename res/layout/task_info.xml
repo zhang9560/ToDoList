@@ -17,10 +17,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <Spinner
+        android:id="@+id/task_info_tags"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/task_info_due_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/choose_due_date" />
+
+    <EditText
+        android:id="@+id/task_info_comments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_comments"
+        android:maxLines="10" />
 
 </LinearLayout>

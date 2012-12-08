@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import app.todolist.R;
 import app.todolist.data.TaskProvider;
+import app.todolist.utils.JOleDateTime;
 
 public class NewTaskActivity extends Activity {
     public static final String TAG = "NewTaskActivity";
@@ -32,6 +33,7 @@ public class NewTaskActivity extends Activity {
             // Insert new task to database.
             ContentValues values = mTaskInfoFragment.getContentValues();
             values.put(TaskProvider.KEY_PARENT_ID, mParentId);
+            values.put(TaskProvider.KEY_LAST_MOD, new JOleDateTime().getDateTime());
             resolver.insert(TaskProvider.TASK_URI, values);
 
             // Update subtask count of new task's parent.
