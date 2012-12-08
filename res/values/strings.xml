@@ -10,4 +10,19 @@
     <string name="archive_task">Archive task</string>
     <string name="title">Title</string>
     <string name="please_wait">Please wait ...</string>
+
+    <string-array name="priority_array">
+        <item>None</item>
+        <item>0 (Lowest)</item>
+        <item>1 (Very Low)</item>
+        <item>2 (Low)</item>
+        <item>3 (Low-Med)</item>
+        <item>4 (Medium)</item>
+        <item>5 (Medium)</item>
+        <item>6 (Medium)</item>
+        <item>7 (Medium-High)</item>
+        <item>8 (High)</item>
+        <item>9 (Very High)</item>
+        <item>10 (Highest)</item>
+    </string-array>
 </resources>

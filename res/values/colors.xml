@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="priority_none">#00000000</color>
+    <color name="priority_0">#1EE100</color>
+    <color name="priority_1">#00E43F</color>
+    <color name="priority_2">#00E7A0</color>
+    <color name="priority_3">#00D1EA</color>
+    <color name="priority_4">#0071ED</color>
+    <color name="priority_5">#000FF0</color>
+    <color name="priority_6">#5400F3</color>
+    <color name="priority_7">#BA00F6</color>
+    <color name="priority_8">#F900CD</color>
+    <color name="priority_9">#FC0068</color>
+    <color name="priority_10">#FF0000</color>
+</resources>

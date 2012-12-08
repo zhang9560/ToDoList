@@ -9,6 +9,12 @@
         android:id="@+id/task_info_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:singleLine="true"
         android:hint="@string/title" />
+
+    <Spinner
+        android:id="@+id/task_info_priority"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
