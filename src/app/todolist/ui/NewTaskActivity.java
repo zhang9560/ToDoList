@@ -22,10 +22,7 @@ public class NewTaskActivity extends Activity {
     private class InsertTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
-            mDialog = new ProgressDialog(NewTaskActivity.this, android.R.style.Theme_Holo_Panel);
-            mDialog.setCancelable(false);
-            mDialog.setMessage(getString(R.string.please_wait));
-            mDialog.show();
+            mDialog = ProgressDialog.show(NewTaskActivity.this, null, getString(R.string.please_wait), true, false);
         }
 
         @Override
