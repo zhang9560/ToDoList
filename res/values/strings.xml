@@ -9,4 +9,5 @@
     <string name="delete_task">Delete task</string>
     <string name="archive_task">Archive task</string>
     <string name="title">Title</string>
+    <string name="please_wait">Please wait ...</string>
 </resources>
