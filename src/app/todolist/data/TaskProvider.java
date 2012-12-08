@@ -94,6 +94,7 @@ public class TaskProvider extends ContentProvider {
             "tags " +
             "(" +
             "_id integer primary key, " +
+            "LISTID integer, " +
             "NAME text);";
 
     private static final class DatabaseHelper extends SQLiteOpenHelper {

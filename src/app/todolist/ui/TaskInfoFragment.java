@@ -4,7 +4,11 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +19,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import app.todolist.R;
 import app.todolist.data.PrioritySpinnerAdapter;
+import app.todolist.data.TagsAdapter;
 import app.todolist.data.TaskProvider;
 import app.todolist.utils.JOleDateTime;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class TaskInfoFragment extends Fragment implements View.OnClickListener {
+public class TaskInfoFragment extends Fragment implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String COMMENT_STYLE_PLAIN_TEXT = "PLAIN_TEXT";
     public static final String COMMENT_STYLE_RICH_TEXT = "849cf988-79fe-418a-a40d-01fe3afcab2c";
@@ -52,7 +57,6 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
         mTitle = (EditText)view.findViewById(R.id.task_info_title);
         mComments = (EditText)view.findViewById(R.id.task_info_comments);
         mPrioritySpinner = (Spinner)view.findViewById(R.id.task_info_priority);
-        mTagsSpinner = (Spinner)view.findViewById(R.id.task_info_tags);
         mPrioritySpinner.setAdapter(new PrioritySpinnerAdapter(getActivity()));
         mDueDateBtn = (Button)view.findViewById(R.id.task_info_due_date);
         mDueDateBtn.setOnClickListener(this);
@@ -61,10 +65,35 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
     public void onClick(View view) {
         if (view == mDueDateBtn) {
             new DatePickerFragment().show(getFragmentManager(), "datepicker");
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(getActivity(), TaskProvider.TAG_URI, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        if (mAdapter == null) {
+            mAdapter = new TagsAdapter(getActivity(), cursor, 0);
+        } else {
+            mAdapter.swapCursor(cursor);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mAdapter.swapCursor(null);
     }
 
     public ContentValues getContentValues() {
@@ -87,11 +116,12 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     private EditText mTitle;
     private EditText mComments;
     private Spinner mPrioritySpinner;
-    private Spinner mTagsSpinner;
     private Button mDueDateBtn;
     private double mDueDate = 0;
     private double mStartDate = 0;
     private double mCreationDate = new JOleDateTime().getDateTime();
     private String mCommentStyle = COMMENT_STYLE_PLAIN_TEXT;
     private int mPercentDone = 0;
+
+    private TagsAdapter mAdapter;
 }

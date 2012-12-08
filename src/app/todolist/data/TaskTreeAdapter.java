@@ -25,14 +25,12 @@ public class TaskTreeAdapter extends CursorAdapter {
 
     public TaskTreeAdapter(Context context, Cursor c, int flags, boolean showSubtaskCount) {
         super(context, c, flags);
-
-        mContext = context;
         mShowSubtaskCount = showSubtaskCount;
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.task_item, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.task_item, null);
         ViewHolder holder = new ViewHolder();
 
         holder.priority = (ImageView)view.findViewById(R.id.task_priority_img);
@@ -99,6 +97,5 @@ public class TaskTreeAdapter extends CursorAdapter {
 
     protected static final SimpleDateFormat sDueDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
-    private Context mContext;
     private boolean mShowSubtaskCount;
 }
