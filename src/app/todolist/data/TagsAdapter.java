@@ -2,12 +2,10 @@ package app.todolist.data;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CursorAdapter;
-import app.todolist.R;
 
 public class TagsAdapter extends CursorAdapter {
 
@@ -17,7 +15,7 @@ public class TagsAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        return LayoutInflater.from(context).inflate(R.layout.tags_spinner_item, null);
+        return null;
     }
 
     @Override

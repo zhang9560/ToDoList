@@ -12,10 +12,21 @@
         android:singleLine="true"
         android:hint="@string/title" />
 
-    <Spinner
-        android:id="@+id/task_info_priority"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/priority" />
+        <Spinner
+            android:id="@+id/task_info_priority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dip" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/task_info_due_date"
