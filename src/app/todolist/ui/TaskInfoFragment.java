@@ -16,10 +16,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.MultiAutoCompleteTextView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import app.todolist.R;
 import app.todolist.data.PrioritySpinnerAdapter;
-import app.todolist.data.TagsAdapter;
 import app.todolist.data.TaskProvider;
 import app.todolist.utils.JOleDateTime;
 
@@ -30,6 +31,10 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
 
     public static final String COMMENT_STYLE_PLAIN_TEXT = "PLAIN_TEXT";
     public static final String COMMENT_STYLE_RICH_TEXT = "849cf988-79fe-418a-a40d-01fe3afcab2c";
+
+    private static final String[] COUNTRIES = new String[] {
+            "Belgium", "France", "Italy", "Germany", "Spain"
+    };
 
     private class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
@@ -56,6 +61,7 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
         View view = inflater.inflate(R.layout.task_info, null);
         mTitle = (EditText)view.findViewById(R.id.task_info_title);
         mComments = (EditText)view.findViewById(R.id.task_info_comments);
+        mTags = (MultiAutoCompleteTextView)view.findViewById(R.id.task_info_tags);
         mPrioritySpinner = (Spinner)view.findViewById(R.id.task_info_priority);
         mPrioritySpinner.setAdapter(new PrioritySpinnerAdapter(getActivity()));
         mDueDateBtn = (Button)view.findViewById(R.id.task_info_due_date);
@@ -84,16 +90,20 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        if (mAdapter == null) {
-            mAdapter = new TagsAdapter(getActivity(), cursor, 0);
+        if (mTagsAdapter == null) {
+            String[] from = {TaskProvider.KEY_TAG_NAME};
+            int[] to = {android.R.id.text1};
+            mTagsAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line, cursor, from, to, 0);
+            mTags.setAdapter(mTagsAdapter);
+            mTags.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
         } else {
-            mAdapter.swapCursor(cursor);
+            mTagsAdapter.swapCursor(cursor);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mAdapter.swapCursor(null);
+        mTagsAdapter.swapCursor(null);
     }
 
     public ContentValues getContentValues() {
@@ -115,6 +125,7 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
 
     private EditText mTitle;
     private EditText mComments;
+    private MultiAutoCompleteTextView mTags;
     private Spinner mPrioritySpinner;
     private Button mDueDateBtn;
     private double mDueDate = 0;
@@ -123,5 +134,5 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
     private String mCommentStyle = COMMENT_STYLE_PLAIN_TEXT;
     private int mPercentDone = 0;
 
-    private TagsAdapter mAdapter;
+    private SimpleCursorAdapter mTagsAdapter;
 }
