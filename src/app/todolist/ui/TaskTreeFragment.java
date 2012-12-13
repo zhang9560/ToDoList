@@ -3,10 +3,12 @@ package app.todolist.ui;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -24,6 +26,35 @@ import java.util.Stack;
 
 public class TaskTreeFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = "TaskTreeFragment";
+
+    private class TaskOperation extends AsyncTask<Long, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            mDialog = ProgressDialog.show(TaskTreeFragment.this.getActivity(), null, TaskTreeFragment.this.getString(R.string.please_wait), true, false);
+        }
+
+        @Override
+        protected Void doInBackground(Long... params) {
+            int contextMenuId = params[0].intValue();
+            long taskId = params[1];
+
+            switch (contextMenuId) {
+                case R.id.complete_task:
+                    MainActivity activity = (MainActivity)(TaskTreeFragment.this.getActivity());
+                    activity.completeTask(taskId, mParentIdStack.peek());
+                    break;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mDialog.dismiss();
+            refreshTaskTree();
+        }
+
+        private ProgressDialog mDialog;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,10 +79,13 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+
         switch (item.getItemId()) {
             case R.id.edit_task:
-                AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-                Log.d(TAG, "task id = " + menuInfo.id);
+                break;
+            case R.id.complete_task:
+                new TaskOperation().execute(Long.valueOf(item.getItemId()), menuInfo.id);
                 break;
         }
         return true;
@@ -74,7 +108,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         switch (item.getItemId()) {
             case R.id.main_activity_menu_back:
                 mParentIdStack.pop();
-                getLoaderManager().restartLoader(0, null, this);
+                refreshTaskTree();
                 getActivity().invalidateOptionsMenu();
                 break;
             case R.id.main_activity_menu_new_task:
@@ -90,7 +124,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            getLoaderManager().restartLoader(0, null, this);
+            refreshTaskTree();
         }
     }
 
@@ -119,8 +153,12 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         Log.d(TAG, "[onListItemClick] task id = " + id);
 
         mParentIdStack.push(id);
-        getLoaderManager().restartLoader(0, null, this);
+        refreshTaskTree();
         getActivity().invalidateOptionsMenu();
+    }
+
+    private void refreshTaskTree() {
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     private TaskTreeAdapter mAdapter;

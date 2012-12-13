@@ -2,6 +2,9 @@ package app.todolist.data;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StrikethroughSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,21 +50,30 @@ public class TaskTreeAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder)view.getTag();
         holder.priority.setBackgroundResource(priority2Res(cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PRIORITY))));
-        holder.title.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE)));
-        holder.tags.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));
 
-        int doneSubTaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_DONE_SUBTASK_COUNT));
-        int subtaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_SUBTASK_COUNT));
-        holder.subtaskCount.setText(null); // Clear content.
-        if (subtaskCount > 0 && mShowSubtaskCount) {
-            holder.subtaskCount.setText(String.format("(%d / %d)", doneSubTaskCount, subtaskCount));
-        }
+        String title = cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE));
+        if (cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PERCENTDONE)) == 100) {
+            // If the task is done, it doesn't show any other information except task's title.
+            SpannableString strikeTitle = new SpannableString(title);
+            strikeTitle.setSpan(sStrikethroughSpan, 0, title.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            holder.title.setText(strikeTitle);
+        } else {
+            holder.title.setText(title);
+            holder.tags.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));
 
-        double dateTime = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));
-        holder.dueDate.setText(null); // Clear content.
-        if(dateTime > 0) {
-            JOleDateTime dueDate = new JOleDateTime(dateTime);
-            holder.dueDate.setText(sDueDateFormat.format(dueDate.getTime()));
+            int doneSubTaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_DONE_SUBTASK_COUNT));
+            int subtaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_SUBTASK_COUNT));
+            holder.subtaskCount.setText(null); // Clear content.
+            if (subtaskCount > 0 && mShowSubtaskCount) {
+                holder.subtaskCount.setText(String.format("(%d / %d)", doneSubTaskCount, subtaskCount));
+            }
+
+            double dateTime = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));
+            holder.dueDate.setText(null); // Clear content.
+            if(dateTime > 0) {
+                JOleDateTime dueDate = new JOleDateTime(dateTime);
+                holder.dueDate.setText(sDueDateFormat.format(dueDate.getTime()));
+            }
         }
     }
 
@@ -97,6 +109,7 @@ public class TaskTreeAdapter extends CursorAdapter {
     }
 
     protected static final SimpleDateFormat sDueDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    private static final StrikethroughSpan sStrikethroughSpan = new StrikethroughSpan();
 
     private boolean mShowSubtaskCount;
 }

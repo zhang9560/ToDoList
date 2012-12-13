@@ -3,10 +3,16 @@ package app.todolist.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import app.todolist.R;
+import app.todolist.data.TaskProvider;
 import app.todolist.data.ViewPagerMainAdapter;
+import app.todolist.utils.JOleDateTime;
 
 public class MainActivity extends Activity implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
 
@@ -78,6 +84,30 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
     @Override
     public void onPageScrollStateChanged(int i) {
 
+    }
+
+    public void completeTask(long taskId, long parentId) {
+        ContentResolver resolver = getContentResolver();
+        ContentValues values = new ContentValues();
+        double now = new JOleDateTime().getDateTime();
+
+        values.put(TaskProvider.KEY_DONE_DATE, now);
+        values.put(TaskProvider.KEY_LAST_MOD, now);
+        values.put(TaskProvider.KEY_PERCENTDONE, 100);
+
+        if (resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), values, null, null) > 0 && parentId > 0) {
+            // Update done subtask count of the task's parent.
+            // Top level tasks have no parents, so needn't update when updating a top level task.
+            String[] projection = {"count(*)"};
+            String selection = String.format("%s=%d and %s=%d", TaskProvider.KEY_PARENT_ID, parentId, TaskProvider.KEY_PERCENTDONE, 100);
+            Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                values.clear();
+                values.put(TaskProvider.KEY_DONE_SUBTASK_COUNT, cursor.getLong(0));
+                resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(parentId)), values, null, null);
+            }
+        }
     }
 
     private ViewPager mViewPager;
