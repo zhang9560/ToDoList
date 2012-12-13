@@ -5,9 +5,10 @@
     <string name="overdue">overdue</string>
     <string name="new_task">New task</string>
     <string name="edit_task">Edit task</string>
-    <string name="complete_task">Complete task</string>
-    <string name="delete_task">Delete task</string>
-    <string name="archive_task">Archive task</string>
+    <string name="edit">Edit</string>
+    <string name="complete">Complete</string>
+    <string name="delete">Delete</string>
+    <string name="archive">Archive</string>
     <string name="title">Title</string>
     <string name="choose_due_date">Choose due date</string>
     <string name="please_wait">Please wait ...</string>

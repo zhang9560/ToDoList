@@ -50,10 +50,11 @@ public class TaskTreeAdapter extends CursorAdapter {
         holder.title.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE)));
         holder.tags.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));
 
+        int doneSubTaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_DONE_SUBTASK_COUNT));
         int subtaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_SUBTASK_COUNT));
         holder.subtaskCount.setText(null); // Clear content.
         if (subtaskCount > 0 && mShowSubtaskCount) {
-            holder.subtaskCount.setText(String.format("(%d)", subtaskCount));
+            holder.subtaskCount.setText(String.format("(%d / %d)", doneSubTaskCount, subtaskCount));
         }
 
         double dateTime = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));

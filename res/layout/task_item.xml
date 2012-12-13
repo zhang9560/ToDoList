@@ -25,7 +25,7 @@
                 android:id="@+id/task_title"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
-                android:layout_weight="9"
+                android:layout_weight="8"
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:textAppearance="?android:textAppearanceSmall" />
@@ -33,7 +33,7 @@
                 android:id="@+id/subtask_count"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:gravity="center_vertical|right"
                 android:textAppearance="?android:textAppearanceSmall" />
         </LinearLayout>
