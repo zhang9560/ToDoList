@@ -7,15 +7,16 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.Spinner;
 import app.todolist.R;
@@ -48,7 +49,7 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
         public void onDateSet(DatePicker datePicker, int year, int month, int day) {
             JOleDateTime dateTime = new JOleDateTime(year,  month, day);
             TaskInfoFragment.this.mDueDate = dateTime.getDateTime();
-            mDueDateBtn.setText(sDueDateFormat.format(dateTime.getTime()));
+            mDueDateText.setText(sDueDateFormat.format(dateTime.getTime()));
         }
     }
 
@@ -59,7 +60,8 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
         mComments = (EditText)view.findViewById(R.id.task_info_comments);
         mPrioritySpinner = (Spinner)view.findViewById(R.id.task_info_priority);
         mPrioritySpinner.setAdapter(new PrioritySpinnerAdapter(getActivity()));
-        mDueDateBtn = (Button)view.findViewById(R.id.task_info_due_date);
+        mDueDateText = (EditText)view.findViewById(R.id.task_info_due_date_text);
+        mDueDateBtn = (ImageView)view.findViewById(R.id.task_info_due_date_btn);
         mDueDateBtn.setOnClickListener(this);
 
         mTags = (MultiAutoCompleteTextView)view.findViewById(R.id.task_info_tags);
@@ -131,7 +133,8 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
     private EditText mComments;
     private MultiAutoCompleteTextView mTags;
     private Spinner mPrioritySpinner;
-    private Button mDueDateBtn;
+    private EditText mDueDateText;
+    private ImageView mDueDateBtn;
     private double mDueDate = 0;
     private double mStartDate = 0;
     private double mCreationDate = new JOleDateTime().getDateTime();

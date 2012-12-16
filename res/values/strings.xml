@@ -10,7 +10,7 @@
     <string name="delete">Delete</string>
     <string name="archive">Archive</string>
     <string name="title">Title</string>
-    <string name="choose_due_date">Choose due date</string>
+    <string name="no_due_date">No due date</string>
     <string name="please_wait">Please wait ...</string>
     <string name="enter_comments">Please enter comments here</string>
     <string name="tags">Tags</string>
