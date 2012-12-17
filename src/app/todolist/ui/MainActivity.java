@@ -86,14 +86,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
 
     }
 
-    public void completeTask(long taskId, long parentId) {
+    public void completeTask(long taskId, long parentId, boolean done) {
         ContentResolver resolver = getContentResolver();
         ContentValues values = new ContentValues();
         double now = new JOleDateTime().getDateTime();
 
-        values.put(TaskProvider.KEY_DONE_DATE, now);
+        values.put(TaskProvider.KEY_DONE_DATE, done ? now : 0);
         values.put(TaskProvider.KEY_LAST_MOD, now);
-        values.put(TaskProvider.KEY_PERCENTDONE, 100);
+        values.put(TaskProvider.KEY_PERCENTDONE, done ? 100 : 0);
 
         if (resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), values, null, null) > 0 && parentId > 0) {
             // Update done subtask count of the task's parent.

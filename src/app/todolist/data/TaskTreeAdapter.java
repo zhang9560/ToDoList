@@ -21,7 +21,7 @@ import app.todolist.utils.JOleDateTime;
 
 import java.text.SimpleDateFormat;
 
-public class TaskTreeAdapter extends CursorAdapter implements CheckBox.OnCheckedChangeListener {
+public class TaskTreeAdapter extends CursorAdapter implements CheckBox.OnClickListener {
 
     private static class ViewHolder {
         ImageView priority;
@@ -49,7 +49,7 @@ public class TaskTreeAdapter extends CursorAdapter implements CheckBox.OnChecked
         holder.dueDate = (TextView)view.findViewById(R.id.task_due_date);
         holder.tags = (TextView)view.findViewById(R.id.task_tags);
         holder.completed = (CheckBox)view.findViewById(R.id.task_completion_checkbox);
-        holder.completed.setOnCheckedChangeListener(this);
+        holder.completed.setOnClickListener(this);
 
         view.setTag(holder);
         return view;
@@ -97,14 +97,15 @@ public class TaskTreeAdapter extends CursorAdapter implements CheckBox.OnChecked
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+    public void onClick(View view) {
         if (mHandler != null) {
-            long taskId = Long.valueOf(buttonView.getTag(R.id.tag_key_task_id).toString());
+            CheckBox checkBox = (CheckBox)view;
+            long taskId = Long.valueOf(checkBox.getTag(R.id.tag_key_task_id).toString());
             Message msg = new Message();
-            msg.what = R.id.complete_task;
             Bundle bundle = new Bundle();
             bundle.putLong(TaskProvider.KEY_ID, taskId);
-            bundle.putInt(TaskProvider.KEY_PERCENTDONE, isChecked ? 100 : 0);
+            bundle.putInt(TaskProvider.KEY_PERCENTDONE, checkBox.isChecked() ? 100 : 0);
+            msg.setData(bundle);
 
             mHandler.sendMessage(msg);
         }

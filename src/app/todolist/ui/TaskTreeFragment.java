@@ -39,11 +39,12 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         protected Void doInBackground(Long... params) {
             int contextMenuId = params[0].intValue();
             long taskId = params[1];
+            boolean done = (params[2] == 1L);
 
             switch (contextMenuId) {
                 case R.id.complete_task:
                     MainActivity activity = (MainActivity)(TaskTreeFragment.this.getActivity());
-                    activity.completeTask(taskId, mParentIdStack.peek());
+                    activity.completeTask(taskId, mParentIdStack.peek(), done);
                     break;
             }
             return null;
@@ -85,9 +86,6 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
         switch (item.getItemId()) {
             case R.id.edit_task:
-                break;
-            case R.id.complete_task:
-                completeTask(menuInfo.id);
                 break;
         }
         return true;
@@ -163,24 +161,15 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         getLoaderManager().restartLoader(0, null, this);
     }
 
-    private void completeTask(long taskId) {
-        new TaskOperation().execute((long)R.id.complete_task, taskId);
+    private void completeTask(long taskId, boolean done) {
+        new TaskOperation().execute((long)R.id.complete_task, taskId, done ? 1L : 0L);
     }
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             Bundle bundle = msg.getData();
-
-            switch (msg.what) {
-                case R.id.complete_task:
-                    long taskId = bundle.getLong(TaskProvider.KEY_ID);
-                    boolean isCompoleted = bundle.getInt(TaskProvider.KEY_PERCENTDONE) == 100;
-                    if (isCompoleted) {
-                        completeTask(taskId);
-                    }
-                    break;
-            }
+            completeTask(bundle.getLong(TaskProvider.KEY_ID), bundle.getInt(TaskProvider.KEY_PERCENTDONE) == 100);
         }
     };
 
