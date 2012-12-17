@@ -10,6 +10,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -85,7 +87,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
             case R.id.edit_task:
                 break;
             case R.id.complete_task:
-                new TaskOperation().execute(Long.valueOf(item.getItemId()), menuInfo.id);
+                completeTask(menuInfo.id);
                 break;
         }
         return true;
@@ -136,7 +138,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (mAdapter == null) {
-            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0, true);
+            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0, true, mHandler);
             setListAdapter(mAdapter);
         } else {
             mAdapter.swapCursor(cursor);
@@ -160,6 +162,27 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     private void refreshTaskTree() {
         getLoaderManager().restartLoader(0, null, this);
     }
+
+    private void completeTask(long taskId) {
+        new TaskOperation().execute((long)R.id.complete_task, taskId);
+    }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Bundle bundle = msg.getData();
+
+            switch (msg.what) {
+                case R.id.complete_task:
+                    long taskId = bundle.getLong(TaskProvider.KEY_ID);
+                    boolean isCompoleted = bundle.getInt(TaskProvider.KEY_PERCENTDONE) == 100;
+                    if (isCompoleted) {
+                        completeTask(taskId);
+                    }
+                    break;
+            }
+        }
+    };
 
     private TaskTreeAdapter mAdapter;
     private Stack<Long> mParentIdStack = new Stack<Long>();

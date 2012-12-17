@@ -58,7 +58,7 @@ public class UpcomingFragment extends ListFragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         if (mAdapter == null) {
-            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0, false);
+            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0, false, null);
             setListAdapter(mAdapter);
         } else {
             mAdapter.swapCursor(cursor);

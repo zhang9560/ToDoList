@@ -2,12 +2,17 @@ package app.todolist.data;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,7 +21,7 @@ import app.todolist.utils.JOleDateTime;
 
 import java.text.SimpleDateFormat;
 
-public class TaskTreeAdapter extends CursorAdapter {
+public class TaskTreeAdapter extends CursorAdapter implements CheckBox.OnCheckedChangeListener {
 
     private static class ViewHolder {
         ImageView priority;
@@ -24,11 +29,13 @@ public class TaskTreeAdapter extends CursorAdapter {
         TextView subtaskCount;
         TextView dueDate;
         TextView tags;
+        CheckBox completed;
     }
 
-    public TaskTreeAdapter(Context context, Cursor c, int flags, boolean showSubtaskCount) {
+    public TaskTreeAdapter(Context context, Cursor c, int flags, boolean showSubtaskCount, Handler handler) {
         super(context, c, flags);
         mShowSubtaskCount = showSubtaskCount;
+        mHandler = handler;
     }
 
     @Override
@@ -41,6 +48,8 @@ public class TaskTreeAdapter extends CursorAdapter {
         holder.subtaskCount = (TextView)view.findViewById(R.id.subtask_count);
         holder.dueDate = (TextView)view.findViewById(R.id.task_due_date);
         holder.tags = (TextView)view.findViewById(R.id.task_tags);
+        holder.completed = (CheckBox)view.findViewById(R.id.task_completion_checkbox);
+        holder.completed.setOnCheckedChangeListener(this);
 
         view.setTag(holder);
         return view;
@@ -49,21 +58,31 @@ public class TaskTreeAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder)view.getTag();
+        holder.completed.setTag(R.id.tag_key_task_id, cursor.getLong(cursor.getColumnIndex(TaskProvider.KEY_ID)));
         holder.priority.setBackgroundResource(priority2Res(cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PRIORITY))));
+
+        // Clear contents.
+        holder.subtaskCount.setText(null);
+        holder.dueDate.setText(null);
+        holder.tags.setText(null);
 
         String title = cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE));
         if (cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PERCENTDONE)) == 100) {
+            holder.completed.setChecked(true);
             // If the task is done, it doesn't show any other information except task's title.
             SpannableString strikeTitle = new SpannableString(title);
             strikeTitle.setSpan(sStrikethroughSpan, 0, title.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            holder.title.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
             holder.title.setText(strikeTitle);
         } else {
+            holder.completed.setChecked(false);
+            holder.title.setTextColor(context.getResources().getColor(android.R.color.black));
             holder.title.setText(title);
             holder.tags.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));
 
             int doneSubTaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_DONE_SUBTASK_COUNT));
             int subtaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_SUBTASK_COUNT));
-            holder.subtaskCount.setText(null); // Clear content.
+
             if (subtaskCount > 0 && mShowSubtaskCount) {
                 holder.subtaskCount.setText(String.format("(%d / %d)", doneSubTaskCount, subtaskCount));
             }
@@ -74,6 +93,20 @@ public class TaskTreeAdapter extends CursorAdapter {
                 JOleDateTime dueDate = new JOleDateTime(dateTime);
                 holder.dueDate.setText(sDueDateFormat.format(dueDate.getTime()));
             }
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (mHandler != null) {
+            long taskId = Long.valueOf(buttonView.getTag(R.id.tag_key_task_id).toString());
+            Message msg = new Message();
+            msg.what = R.id.complete_task;
+            Bundle bundle = new Bundle();
+            bundle.putLong(TaskProvider.KEY_ID, taskId);
+            bundle.putInt(TaskProvider.KEY_PERCENTDONE, isChecked ? 100 : 0);
+
+            mHandler.sendMessage(msg);
         }
     }
 
@@ -108,8 +141,9 @@ public class TaskTreeAdapter extends CursorAdapter {
         }
     }
 
-    protected static final SimpleDateFormat sDueDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    private static final SimpleDateFormat sDueDateFormat = new SimpleDateFormat("MM/dd/yyyy");
     private static final StrikethroughSpan sStrikethroughSpan = new StrikethroughSpan();
 
     private boolean mShowSubtaskCount;
+    private Handler mHandler;
 }
