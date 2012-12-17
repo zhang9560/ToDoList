@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,6 +80,16 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (mTaskId > 0) {
+            Uri uri = Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(mTaskId));
+            Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                mTitle.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE)));
+            }
+        }
+
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -126,6 +137,10 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
         return values;
     }
 
+    public void setTaskId(long id) {
+        mTaskId = id;
+    }
+
     protected static final SimpleDateFormat sDueDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     private EditText mTitle;
@@ -140,5 +155,6 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
     private String mCommentStyle = COMMENT_STYLE_PLAIN_TEXT;
     private int mPercentDone = 0;
 
+    private long mTaskId = 0;
     private TagsAdapter mTagsAdapter;
 }

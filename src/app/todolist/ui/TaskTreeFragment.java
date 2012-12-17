@@ -86,6 +86,10 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
         switch (item.getItemId()) {
             case R.id.edit_task:
+                Intent intent = new Intent(getActivity(), EditTaskActivity.class);
+                intent.putExtra(TaskProvider.KEY_ID, menuInfo.id);
+                intent.putExtra(TaskProvider.KEY_PARENT_ID, mParentIdStack.peek());
+                startActivityForResult(intent, 0);
                 break;
         }
         return true;
