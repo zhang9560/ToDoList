@@ -14,6 +14,8 @@ import app.todolist.data.TaskProvider;
 import app.todolist.data.ViewPagerMainAdapter;
 import app.todolist.utils.JOleDateTime;
 
+import java.util.ArrayList;
+
 public class MainActivity extends Activity implements ActionBar.TabListener, ViewPager.OnPageChangeListener {
 
     public static final String TAG = "MainActivity";
@@ -103,8 +105,52 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
     public void deleteTask(long taskId, long parentId, boolean archived) {
         ContentResolver resolver = getContentResolver();
 
+        // Delete the task pointed by the taskId, and update its parent's subtask count.
         if (resolver.delete(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), null, null) > 0) {
             updateSubTaskCount(parentId, archived);
+        }
+
+        // Delete all subtasks of the deleted task, include archived tasks.
+        String[] projection = {TaskProvider.KEY_ID};
+        Cursor cursor;
+
+        ArrayList<Long> subTaskIds = new ArrayList<Long>();
+        ArrayList<Long> temp = new ArrayList<Long>();
+        temp.add(taskId);
+        ArrayList<Long> temp2 = new ArrayList<Long>();
+
+        while (temp.size() > 0) {
+            for (long id : temp) {
+                String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, id);
+                cursor =  resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        long subTaskId = cursor.getLong(0);
+                        temp2.add(subTaskId);
+                        subTaskIds.add(subTaskId);
+                    }
+                    cursor.close();
+                }
+            }
+
+            temp.clear();
+            for (long id : temp2) {
+                temp.add(id);
+            }
+            temp2.clear();
+        }
+
+        // Now all subtask ids are in subTaskIds, delete them all at once.
+        if (subTaskIds.size() > 0) {
+            String selection = TaskProvider.KEY_ID + " in (";
+            for (long id : subTaskIds) {
+                selection += id;
+                selection += ", ";
+            }
+            selection = selection.substring(0, selection.length() - 2);
+            selection += ")";
+
+            resolver.delete(TaskProvider.TASK_URI, selection, null);
         }
     }
 
