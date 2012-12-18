@@ -87,6 +87,27 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
 
             if (cursor != null && cursor.moveToFirst()) {
                 mTitle.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE)));
+                mTags.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));
+
+                int priority = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PRIORITY));
+                if (priority >= 0) {
+                    mPrioritySpinner.setSelection(priority + 1);
+                }
+
+                mComments.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_COMMENTS)));
+                mCommentStyle = cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_COMMENT_STYLE));
+                if (mCommentStyle.equals(COMMENT_STYLE_RICH_TEXT)) {
+                    mCustomComments = cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_CUSTOM_COMMENTS));
+                }
+
+                mDueDate = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));
+                if (mDueDate > 0) {
+                    mDueDateText.setText(sDueDateFormat.format(new JOleDateTime(mDueDate).getTime()));
+                }
+
+                mStartDate = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_START_DATE));
+                mCreationDate = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_CREATION_DATE));
+                mPercentDone = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PERCENTDONE));
             }
         }
 
@@ -124,8 +145,13 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put(TaskProvider.KEY_TITLE, mTitle.getText().toString());
+
         values.put(TaskProvider.KEY_COMMENTS, mComments.getText().toString());
         values.put(TaskProvider.KEY_COMMENT_STYLE, mCommentStyle);
+        if (mCommentStyle.equals(COMMENT_STYLE_RICH_TEXT)) {
+            values.put(TaskProvider.KEY_CUSTOM_COMMENTS, mCustomComments);
+        }
+
         values.put(TaskProvider.KEY_TAGS, mTags.getEditableText().toString());
         values.put(TaskProvider.KEY_LIST_ID, 1);
         values.put(TaskProvider.KEY_DUE_DATE, mDueDate);
@@ -149,10 +175,12 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
     private Spinner mPrioritySpinner;
     private EditText mDueDateText;
     private ImageView mDueDateBtn;
+
     private double mDueDate = 0;
     private double mStartDate = 0;
     private double mCreationDate = new JOleDateTime().getDateTime();
     private String mCommentStyle = COMMENT_STYLE_PLAIN_TEXT;
+    private String mCustomComments;
     private int mPercentDone = 0;
 
     private long mTaskId = 0;
