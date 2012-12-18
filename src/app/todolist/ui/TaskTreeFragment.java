@@ -129,6 +129,11 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
                 intent.putExtra(TaskProvider.KEY_PARENT_ID, mParentIdStack.peek());
                 startActivityForResult(intent, 0);
                 break;
+            case R.id.main_activity_menu_switch_list:
+                mArchived = 1 - mArchived;
+                refreshTaskTree();
+                getActivity().invalidateOptionsMenu();
+                break;
         }
 
         return true;
