@@ -43,10 +43,13 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
             switch (contextMenuId) {
                 case R.id.complete_task:
-                    activity.completeTask(taskId, mParentIdStack.peek(), (params[2] == 1L));
+                    activity.completeTask(taskId, mParentIdStack.peek(), params[2] == 1L, mArchived == 1);
                     break;
                 case R.id.delete_task:
-                    activity.deleteTask(taskId, mParentIdStack.peek());
+                    activity.deleteTask(taskId, mParentIdStack.peek(), mArchived == 1);
+                    break;
+                case R.id.archive_task:
+                    activity.archiveTask(taskId, mParentIdStack.peek(), mArchived == 1);
                     break;
             }
             return null;
@@ -97,6 +100,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
                 deleteTask(menuInfo.id);
                 break;
             case R.id.archive_task:
+                archiveTask(menuInfo.id);
                 break;
         }
         return true;
@@ -106,12 +110,10 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main_activity_menu, menu);
 
-        MenuItem backItem = menu.findItem(R.id.main_activity_menu_back);
-        if (mParentIdStack.peek() > 0) {
-            backItem.setVisible(true);
-        } else {
-            backItem.setVisible(false);
-        }
+        // Don't display new task button in archive screen.
+        menu.findItem(R.id.main_activity_menu_new_task).setVisible(mArchived == 0);
+        // Don't display back button in top level.
+        menu.findItem(R.id.main_activity_menu_back).setVisible(mParentIdStack.peek() > 0);
     }
 
     @Override
@@ -141,7 +143,8 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, TaskProvider.KEY_PARENT_ID + "=" + mParentIdStack.peek(), null, null);
+        String selection = String.format("%s=%d and %s=%d", TaskProvider.KEY_PARENT_ID,  mParentIdStack.peek(), TaskProvider.KEY_ARCHIVED, mArchived);
+        return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, selection, null, null);
     }
 
     @Override
@@ -180,6 +183,10 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         new TaskOperation().execute((long)R.id.delete_task, taskId);
     }
 
+    private void archiveTask(long taskId) {
+        new TaskOperation().execute((long)R.id.archive_task, taskId);
+    }
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -190,4 +197,5 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
     private TaskTreeAdapter mAdapter;
     private Stack<Long> mParentIdStack = new Stack<Long>();
+    private int mArchived = 0;
 }

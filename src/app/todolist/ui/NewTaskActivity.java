@@ -34,14 +34,14 @@ public class NewTaskActivity extends Activity {
             ContentValues values = mTaskInfoFragment.getContentValues();
             values.put(TaskProvider.KEY_PARENT_ID, mParentId);
             values.put(TaskProvider.KEY_LAST_MOD, new JOleDateTime().getDateTime());
-            resolver.insert(TaskProvider.TASK_URI, values);
+            values.put(TaskProvider.KEY_ARCHIVED, 0);
 
-            // Update subtask count of new task's parent.
-            // Top level tasks have no parents, so needn't update when adding a top level task.
-            if (mParentId > 0) {
+            if (resolver.insert(TaskProvider.TASK_URI, values) != null && mParentId > 0) {
+                // Update subtask count of new task's parent.
+                // Top level tasks have no parents, so needn't update when adding a top level task.
                 String[] projection = {"count(*)"};
-                String where = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, mParentId);
-                Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, where, null, null);
+                String selection = String.format("%s=%d and %s=0", TaskProvider.KEY_PARENT_ID, mParentId, TaskProvider.KEY_ARCHIVED);
+                Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
                 if (cursor != null && cursor.moveToFirst()) {
                     values.clear();
                     values.put(TaskProvider.KEY_SUBTASK_COUNT, cursor.getLong(0));
