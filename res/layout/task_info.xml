@@ -3,7 +3,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:paddingLeft="10dip"
+              android:paddingRight="10dip">
 
     <EditText
         android:id="@+id/task_info_title"
@@ -20,6 +22,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="3dip"
             android:text="@string/priority" />
         <Spinner
             android:id="@+id/task_info_priority"
@@ -37,6 +40,7 @@
             android:layout_height="wrap_content"
             android:paddingRight="50dip"
             android:singleLine="true"
+            android:inputType="date"
             android:hint="@string/no_due_date" />
         <ImageView
             android:id="@+id/task_info_due_date_btn"

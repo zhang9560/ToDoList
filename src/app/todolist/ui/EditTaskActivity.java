@@ -79,8 +79,6 @@ public class EditTaskActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.new_task_activity_menu_done:
                 new EditTask().execute();
-                setResult(RESULT_OK);
-                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
