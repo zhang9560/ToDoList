@@ -108,6 +108,8 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
                 mStartDate = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_START_DATE));
                 mCreationDate = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_CREATION_DATE));
                 mPercentDone = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PERCENTDONE));
+
+                cursor.close();
             }
         }
 

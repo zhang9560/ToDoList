@@ -46,6 +46,7 @@ public class NewTaskActivity extends Activity {
                     values.clear();
                     values.put(TaskProvider.KEY_SUBTASK_COUNT, cursor.getLong(0));
                     resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(mParentId)), values, null, null);
+                    cursor.close();
                 }
             }
 

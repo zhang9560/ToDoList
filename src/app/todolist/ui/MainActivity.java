@@ -106,7 +106,37 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
                 values.clear();
                 values.put(TaskProvider.KEY_DONE_SUBTASK_COUNT, cursor.getLong(0));
                 resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(parentId)), values, null, null);
+                cursor.close();
             }
+        }
+    }
+
+    public void deleteTask(long taskId, long parentId) {
+        ContentResolver resolver = getContentResolver();
+
+        if (resolver.delete(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), null, null) > 0 && parentId > 0) {
+            long subTaskCount = 0;
+            long doneSubTaskCount = 0;
+
+            String[] projection = {"count(*)"};
+            String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, parentId);
+            Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                subTaskCount = cursor.getLong(0);
+                cursor.close();
+            }
+
+            selection = String.format("%s=%d and %s=%d", TaskProvider.KEY_PARENT_ID, parentId, TaskProvider.KEY_PERCENTDONE, 100);
+            cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                doneSubTaskCount = cursor.getLong(0);
+                cursor.close();
+            }
+
+            ContentValues values = new ContentValues();
+            values.put(TaskProvider.KEY_SUBTASK_COUNT, subTaskCount);
+            values.put(TaskProvider.KEY_DONE_SUBTASK_COUNT, doneSubTaskCount);
+            resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(parentId)), values, null, null);
         }
     }
 

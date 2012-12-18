@@ -39,12 +39,14 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         protected Void doInBackground(Long... params) {
             int contextMenuId = params[0].intValue();
             long taskId = params[1];
-            boolean done = (params[2] == 1L);
+            MainActivity activity = (MainActivity)(TaskTreeFragment.this.getActivity());
 
             switch (contextMenuId) {
                 case R.id.complete_task:
-                    MainActivity activity = (MainActivity)(TaskTreeFragment.this.getActivity());
-                    activity.completeTask(taskId, mParentIdStack.peek(), done);
+                    activity.completeTask(taskId, mParentIdStack.peek(), (params[2] == 1L));
+                    break;
+                case R.id.delete_task:
+                    activity.deleteTask(taskId, mParentIdStack.peek());
                     break;
             }
             return null;
@@ -90,6 +92,11 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
                 intent.putExtra(TaskProvider.KEY_ID, menuInfo.id);
                 intent.putExtra(TaskProvider.KEY_PARENT_ID, mParentIdStack.peek());
                 startActivityForResult(intent, 0);
+                break;
+            case R.id.delete_task:
+                deleteTask(menuInfo.id);
+                break;
+            case R.id.archive_task:
                 break;
         }
         return true;
@@ -167,6 +174,10 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
     private void completeTask(long taskId, boolean done) {
         new TaskOperation().execute((long)R.id.complete_task, taskId, done ? 1L : 0L);
+    }
+
+    private void deleteTask(long taskId) {
+        new TaskOperation().execute((long)R.id.delete_task, taskId);
     }
 
     private Handler mHandler = new Handler() {
