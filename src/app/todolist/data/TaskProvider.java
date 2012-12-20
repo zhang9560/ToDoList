@@ -36,7 +36,6 @@ public class TaskProvider extends ContentProvider {
     public static final String KEY_TAGS = "TAGS";
     public static final String KEY_SUBTASK_COUNT = "SUBTASKCOUNT";
     public static final String KEY_DONE_SUBTASK_COUNT="DONESUBTASKCOUNT";
-    public static final String KEY_ARCHIVED = "ARCHIVED";
     public static final String KEY_PROJECT_NAME = "PROJECTNAME";
     public static final String KEY_FILE_NAME = "FILENAME";
     public static final String KEY_TAG_NAME = "NAME";
@@ -84,8 +83,28 @@ public class TaskProvider extends ContentProvider {
             "PARENTID integer, " +
             "TAGS text, " +
             "DONESUBTASKCOUNT integer, " +
-            "SUBTASKCOUNT integer, " +
-            "ARCHIVED integer);";
+            "SUBTASKCOUNT integer);";
+
+    private static final String CREATE_ARCHIVE_TABLE = "create table " +
+            "archive " +
+            "(" +
+            "_id integer, " +
+            "TITLE text, " +
+            "COMMENTS text, " +
+            "COMMENTSTYLE text, " +
+            "CUSTOMCOMMENTS text, " +
+            "PRIORITY integer, " +
+            "PERCENTDONE integer, " +
+            "CREATIONDATE real, " +
+            "LASTMOD real, " +
+            "STARTDATE real, " +
+            "DUEDATE real, " +
+            "DONEDATE real, " +
+            "LISTID integer, " +
+            "PARENTID integer, " +
+            "TAGS text, " +
+            "DONESUBTASKCOUNT integer, " +
+            "SUBTASKCOUNT integer);";
 
     private static final String CREATE_LISTS_TABLE = "create table " +
             "lists " +
@@ -113,6 +132,7 @@ public class TaskProvider extends ContentProvider {
 
             try {
                 sqLiteDatabase.execSQL(CREATE_TASKS_TABLE);
+                sqLiteDatabase.execSQL(CREATE_ARCHIVE_TABLE);
                 sqLiteDatabase.execSQL(CREATE_LISTS_TABLE);
                 sqLiteDatabase.execSQL(CREATE_TAGS_TABLE);
                 sqLiteDatabase.setTransactionSuccessful();

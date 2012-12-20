@@ -88,7 +88,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
 
     }
 
-    public void completeTask(long taskId, long parentId, boolean done, boolean archived) {
+    public void completeTask(long taskId, long parentId, boolean done) {
         ContentResolver resolver = getContentResolver();
         ContentValues values = new ContentValues();
         double now = new JOleDateTime().getDateTime();
@@ -98,16 +98,16 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         values.put(TaskProvider.KEY_LAST_MOD, now);
 
         if (resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), values, null, null) > 0) {
-           updateSubTaskCount(parentId, archived);
+           updateSubTaskCount(parentId);
         }
     }
 
-    public void deleteTask(long taskId, long parentId, boolean archived) {
+    public void deleteTask(long taskId, long parentId) {
         ContentResolver resolver = getContentResolver();
 
         // Delete the task pointed by the taskId, and update its parent's subtask count.
         if (resolver.delete(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), null, null) > 0) {
-            updateSubTaskCount(parentId, archived);
+            updateSubTaskCount(parentId);
         }
 
         // Delete all subtasks of the deleted task, include archived tasks.
@@ -154,17 +154,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         }
     }
 
-    public void archiveTask(long taskId, long parentId, boolean archived) {
-        ContentResolver resolver = getContentResolver();
-        ContentValues values = new ContentValues();
-
-        values.put(TaskProvider.KEY_ARCHIVED, 1);
-        if (resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), values, null, null) > 0) {
-            updateSubTaskCount(parentId, archived);
-        }
-    }
-
-    private void updateSubTaskCount(long parentId, boolean archived) {
+    private void updateSubTaskCount(long parentId) {
         // Top level tasks have no parents, so needn't update when updating a top level task.
         if (parentId > 0) {
             ContentResolver resolver = getContentResolver();
@@ -172,7 +162,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
             long doneSubTaskCount = 0;
 
             String[] projection = {"count(*)"};
-            String selection = String.format("%s=%d and %s=%d", TaskProvider.KEY_PARENT_ID, parentId, TaskProvider.KEY_ARCHIVED, archived ? 1 : 0);
+            String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, parentId);
             Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 subTaskCount = cursor.getLong(0);
