@@ -15,6 +15,7 @@ public class TaskProvider extends ContentProvider {
 
     // Table names of the database.
     public static final String TASKS_TABLE = "tasks";
+    public static final String ARCHIVE_TABLE = "archive";
     public static final String LISTS_TABLE = "lists";
     public static final String TAGS_TABLE = "tags";
 
@@ -42,6 +43,7 @@ public class TaskProvider extends ContentProvider {
 
     public static final Uri CONTENT_URI = Uri.parse("content://app.todolist.provider");
     public static final Uri TASK_URI = Uri.withAppendedPath(CONTENT_URI, TASKS_TABLE);
+    public static final Uri ARCHIVE_URI = Uri.withAppendedPath(CONTENT_URI, ARCHIVE_TABLE);
     public static final Uri LIST_URI = Uri.withAppendedPath(CONTENT_URI, LISTS_TABLE);
     public static final Uri TAG_URI = Uri.withAppendedPath(CONTENT_URI, TAGS_TABLE);
 
@@ -52,12 +54,16 @@ public class TaskProvider extends ContentProvider {
     private static final int LIST_ID = 4;
     private static final int TAGS = 5;
     private static final int TAG_ID = 6;
+    private static final int ARCHIVE = 7;
+    private static final int ARCHIVE_TASK_ID = 8;
 
     private static final UriMatcher sUriMatcher;
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(CONTENT_URI.getAuthority(), TASKS_TABLE, TASKS);
         sUriMatcher.addURI(CONTENT_URI.getAuthority(), TASKS_TABLE + "/#", TASK_ID);
+        sUriMatcher.addURI(CONTENT_URI.getAuthority(), ARCHIVE_TABLE, ARCHIVE);
+        sUriMatcher.addURI(CONTENT_URI.getAuthority(), ARCHIVE_TABLE + "/#", ARCHIVE_TASK_ID);
         sUriMatcher.addURI(CONTENT_URI.getAuthority(), LISTS_TABLE, LISTS);
         sUriMatcher.addURI(CONTENT_URI.getAuthority(), LISTS_TABLE + "/#", LIST_ID);
         sUriMatcher.addURI(CONTENT_URI.getAuthority(), TAGS_TABLE, TAGS);

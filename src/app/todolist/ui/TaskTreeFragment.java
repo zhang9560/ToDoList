@@ -39,16 +39,16 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         protected Void doInBackground(Long... params) {
             int contextMenuId = params[0].intValue();
             long taskId = params[1];
-            MainActivity activity = (MainActivity)(TaskTreeFragment.this.getActivity());
 
             switch (contextMenuId) {
                 case R.id.complete_task:
-                    activity.completeTask(taskId, mParentIdStack.peek(), params[2] == 1L);
+                    mActivity.completeTask(taskId, mParentIdStack.peek(), params[2] == 1L);
                     break;
                 case R.id.delete_task:
-                    activity.deleteTask(taskId, mParentIdStack.peek());
+                    mActivity.deleteTask(taskId, mParentIdStack.peek());
                     break;
                 case R.id.archive_task:
+                    mActivity.archiveTask(taskId, mParentIdStack.peek());
                     break;
             }
             return null;
@@ -76,13 +76,17 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mActivity = (MainActivity)getActivity();
         getLoaderManager().initLoader(0, null, this);
         registerForContextMenu(getListView());
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        getActivity().getMenuInflater().inflate(R.menu.task_tree_list_context_menu, menu);
+        mActivity.getMenuInflater().inflate(R.menu.task_tree_list_context_menu, menu);
+
+        // Don't show archive menu item in archive mode.
+        menu.findItem(R.id.archive_task).setVisible(!mActivity.getIsArchiveMode());
     }
 
     @Override
@@ -91,7 +95,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
         switch (item.getItemId()) {
             case R.id.edit_task:
-                Intent intent = new Intent(getActivity(), EditTaskActivity.class);
+                Intent intent = new Intent(mActivity, EditTaskActivity.class);
                 intent.putExtra(TaskProvider.KEY_ID, menuInfo.id);
                 intent.putExtra(TaskProvider.KEY_PARENT_ID, mParentIdStack.peek());
                 startActivityForResult(intent, 0);
@@ -100,6 +104,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
                 deleteTask(menuInfo.id);
                 break;
             case R.id.archive_task:
+                archiveTask(menuInfo.id);
                 break;
         }
         return true;
@@ -111,6 +116,8 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
         // Don't display back button in top level.
         menu.findItem(R.id.main_activity_menu_back).setVisible(mParentIdStack.peek() > 0);
+        // Do not allow to add new task in archive mode.
+        menu.findItem(R.id.main_activity_menu_new_task).setVisible(!mActivity.getIsArchiveMode());
     }
 
     @Override
@@ -119,14 +126,17 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
             case R.id.main_activity_menu_back:
                 mParentIdStack.pop();
                 refreshTaskTree();
-                getActivity().invalidateOptionsMenu();
+                mActivity.invalidateOptionsMenu();
                 break;
             case R.id.main_activity_menu_new_task:
-                Intent intent = new Intent(getActivity(), NewTaskActivity.class);
+                Intent intent = new Intent(mActivity, NewTaskActivity.class);
                 intent.putExtra(TaskProvider.KEY_PARENT_ID, mParentIdStack.peek());
                 startActivityForResult(intent, 0);
                 break;
             case R.id.main_activity_menu_switch_list:
+                boolean isArchiveMode = mActivity.getIsArchiveMode();
+                mActivity.setIsArchiveMode(!isArchiveMode);
+                mActivity.invalidateOptionsMenu();
                 break;
         }
 
@@ -143,13 +153,13 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID,  mParentIdStack.peek());
-        return new CursorLoader(getActivity(), TaskProvider.TASK_URI, null, selection, null, null);
+        return new CursorLoader(mActivity, TaskProvider.TASK_URI, null, selection, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (mAdapter == null) {
-            mAdapter = new TaskTreeAdapter(getActivity(), cursor, 0, true, mHandler);
+            mAdapter = new TaskTreeAdapter(mActivity, cursor, 0, true, mHandler);
             setListAdapter(mAdapter);
         } else {
             mAdapter.swapCursor(cursor);
@@ -167,7 +177,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
         mParentIdStack.push(id);
         refreshTaskTree();
-        getActivity().invalidateOptionsMenu();
+        mActivity.invalidateOptionsMenu();
     }
 
     private void refreshTaskTree() {
@@ -182,6 +192,10 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         new TaskOperation().execute((long)R.id.delete_task, taskId);
     }
 
+    private void archiveTask(long taskId) {
+        new TaskOperation().execute((long)R.id.archive_task, taskId);
+    }
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -192,4 +206,5 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
 
     private TaskTreeAdapter mAdapter;
     private Stack<Long> mParentIdStack = new Stack<Long>();
+    private MainActivity mActivity;
 }

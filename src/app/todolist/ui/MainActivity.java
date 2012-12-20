@@ -88,6 +88,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
 
     }
 
+    public void setIsArchiveMode(boolean isArchivedMode) {
+        mIsArchiveMode = isArchivedMode;
+    }
+
+    public boolean getIsArchiveMode() {
+        return mIsArchiveMode;
+    }
+
     public void completeTask(long taskId, long parentId, boolean done) {
         ContentResolver resolver = getContentResolver();
         ContentValues values = new ContentValues();
@@ -143,6 +151,20 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         }
     }
 
+    public void archiveTask(long taskId, long parentId) {
+        ArrayList<Long> list;
+
+        // Copy parents of taskId into archive table.
+        list = getParentIds(taskId);
+        if (list.size() > 0) {
+
+        }
+
+        // Copy taskId and its children into archive table.
+
+        // Delete taskId and its children from tasks table.
+    }
+
     private void updateSubTaskCount(long parentId) {
         // Top level tasks have no parents, so needn't update when updating a top level task.
         if (parentId > 0) {
@@ -172,6 +194,35 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         }
     }
 
+    // Parents are in the lower position, and children are in the higher position.
+    private ArrayList<Long> getParentIds(long taskId) {
+        String[] projection = {TaskProvider.KEY_PARENT_ID};
+        ContentResolver resolver = getContentResolver();
+        Cursor cursor;
+
+        ArrayList<Long> parentIds = new ArrayList<Long>();
+        parentIds.add(taskId);
+
+        while (true) {
+            cursor = resolver.query(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(parentIds.get(0))), projection, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                long parentId = cursor.getLong(0);
+                cursor.close();
+
+                if (parentId > 0) {
+                    parentIds.add(0, parentId);
+                    continue;
+                }
+            }
+
+            break;
+        }
+
+        parentIds.remove(parentIds.size() - 1);
+        return parentIds;
+    }
+
+    // The ArrayList is like a tree, parents in the lower position, and children in the higher position.
     private ArrayList<Long> getSubTaskIds(long taskId) {
         String[] projection = {TaskProvider.KEY_ID};
         ContentResolver resolver = getContentResolver();
@@ -208,4 +259,5 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
 
     private ViewPager mViewPager;
     private ActionBar mActionBar;
+    private boolean mIsArchiveMode;
 }
