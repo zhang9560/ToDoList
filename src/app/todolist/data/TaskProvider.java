@@ -35,7 +35,7 @@ public class TaskProvider extends ContentProvider {
     public static final String KEY_PARENT_ID = "PARENTID";
     public static final String KEY_TAGS = "TAGS";
     public static final String KEY_SUBTASK_COUNT = "SUBTASKCOUNT";
-    public static final String KEY_DONE_SUBTASK_COUNT="DONESUBTASKCOUNT";
+    public static final String KEY_UNCOMPLETED_SUBTASK_COUNT="UNCOMPLETEDSUBTASKCOUNT";
     public static final String KEY_PROJECT_NAME = "PROJECTNAME";
     public static final String KEY_FILE_NAME = "FILENAME";
     public static final String KEY_TAG_NAME = "NAME";
@@ -82,7 +82,7 @@ public class TaskProvider extends ContentProvider {
             "LISTID integer, " +
             "PARENTID integer, " +
             "TAGS text, " +
-            "DONESUBTASKCOUNT integer, " +
+            "UNCOMPLETEDSUBTASKCOUNT integer, " +
             "SUBTASKCOUNT integer);";
 
     private static final String CREATE_ARCHIVE_TABLE = "create table " +
@@ -103,7 +103,7 @@ public class TaskProvider extends ContentProvider {
             "LISTID integer, " +
             "PARENTID integer, " +
             "TAGS text, " +
-            "DONESUBTASKCOUNT integer, " +
+            "UNCOMPLETEDSUBTASKCOUNT integer, " +
             "SUBTASKCOUNT integer);";
 
     private static final String CREATE_LISTS_TABLE = "create table " +

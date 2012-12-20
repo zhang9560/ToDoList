@@ -100,6 +100,23 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         if (resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), values, null, null) > 0) {
            updateSubTaskCount(parentId);
         }
+
+        if (done) {
+            // Complete all subtasks.
+            ArrayList<Long> subTaskIds = getSubTaskIds(taskId);
+
+            if (subTaskIds.size() > 0) {
+                String selection = TaskProvider.KEY_ID + " in (";
+                for (long id : subTaskIds) {
+                    selection += id;
+                    selection += ", ";
+                }
+                selection = selection + taskId + ")";
+
+                values.put(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT, 0);
+                resolver.update(TaskProvider.TASK_URI, values, selection, null);
+            }
+        }
     }
 
     public void deleteTask(long taskId, long parentId) {
@@ -110,8 +127,54 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
             updateSubTaskCount(parentId);
         }
 
-        // Delete all subtasks of the deleted task, include archived tasks.
+        // Delete all subtasks of the deleted task.
+        ArrayList<Long> subTaskIds = getSubTaskIds(taskId);
+
+        if (subTaskIds.size() > 0) {
+            String selection = TaskProvider.KEY_ID + " in (";
+            for (long id : subTaskIds) {
+                selection += id;
+                selection += ", ";
+            }
+            selection = selection.substring(0, selection.length() - 2);
+            selection += ")";
+
+            resolver.delete(TaskProvider.TASK_URI, selection, null);
+        }
+    }
+
+    private void updateSubTaskCount(long parentId) {
+        // Top level tasks have no parents, so needn't update when updating a top level task.
+        if (parentId > 0) {
+            ContentResolver resolver = getContentResolver();
+            long subTaskCount = 0;
+            long uncompletedSubTaskCount = 0;
+
+            String[] projection = {"count(*)"};
+            String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, parentId);
+            Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                subTaskCount = cursor.getLong(0);
+                cursor.close();
+            }
+
+            selection += String.format(" and %s=%d", TaskProvider.KEY_PERCENTDONE, 100);
+            cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                uncompletedSubTaskCount = subTaskCount - cursor.getLong(0);
+                cursor.close();
+            }
+
+            ContentValues values = new ContentValues();
+            values.put(TaskProvider.KEY_SUBTASK_COUNT, subTaskCount);
+            values.put(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT, uncompletedSubTaskCount);
+            resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(parentId)), values, null, null);
+        }
+    }
+
+    private ArrayList<Long> getSubTaskIds(long taskId) {
         String[] projection = {TaskProvider.KEY_ID};
+        ContentResolver resolver = getContentResolver();
         Cursor cursor;
 
         ArrayList<Long> subTaskIds = new ArrayList<Long>();
@@ -140,47 +203,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
             temp2.clear();
         }
 
-        // Now all subtask ids are in subTaskIds, delete them all at once.
-        if (subTaskIds.size() > 0) {
-            String selection = TaskProvider.KEY_ID + " in (";
-            for (long id : subTaskIds) {
-                selection += id;
-                selection += ", ";
-            }
-            selection = selection.substring(0, selection.length() - 2);
-            selection += ")";
-
-            resolver.delete(TaskProvider.TASK_URI, selection, null);
-        }
-    }
-
-    private void updateSubTaskCount(long parentId) {
-        // Top level tasks have no parents, so needn't update when updating a top level task.
-        if (parentId > 0) {
-            ContentResolver resolver = getContentResolver();
-            long subTaskCount = 0;
-            long doneSubTaskCount = 0;
-
-            String[] projection = {"count(*)"};
-            String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, parentId);
-            Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                subTaskCount = cursor.getLong(0);
-                cursor.close();
-            }
-
-            selection += String.format(" and %s=%d", TaskProvider.KEY_PERCENTDONE, 100);
-            cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                doneSubTaskCount = cursor.getLong(0);
-                cursor.close();
-            }
-
-            ContentValues values = new ContentValues();
-            values.put(TaskProvider.KEY_SUBTASK_COUNT, subTaskCount);
-            values.put(TaskProvider.KEY_DONE_SUBTASK_COUNT, doneSubTaskCount);
-            resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(parentId)), values, null, null);
-        }
+        return subTaskIds;
     }
 
     private ViewPager mViewPager;

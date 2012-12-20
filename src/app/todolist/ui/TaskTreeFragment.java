@@ -57,6 +57,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         @Override
         protected void onPostExecute(Void aVoid) {
             mDialog.dismiss();
+            mDialog = null;
             refreshTaskTree();
         }
 

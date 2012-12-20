@@ -34,19 +34,33 @@ public class NewTaskActivity extends Activity {
             ContentValues values = mTaskInfoFragment.getContentValues();
             values.put(TaskProvider.KEY_PARENT_ID, mParentId);
             values.put(TaskProvider.KEY_LAST_MOD, new JOleDateTime().getDateTime());
+            values.put(TaskProvider.KEY_SUBTASK_COUNT, 0);
+            values.put(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT, 0);
 
             if (resolver.insert(TaskProvider.TASK_URI, values) != null && mParentId > 0) {
                 // Update subtask count of new task's parent.
                 // Top level tasks have no parents, so needn't update when adding a top level task.
+                long subTaskCount = 0;
+                long uncompletedSubTaskCount = 0;
                 String[] projection = {"count(*)"};
                 String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, mParentId);
                 Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
                 if (cursor != null && cursor.moveToFirst()) {
-                    values.clear();
-                    values.put(TaskProvider.KEY_SUBTASK_COUNT, cursor.getLong(0));
-                    resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(mParentId)), values, null, null);
+                    subTaskCount = cursor.getLong(0);
                     cursor.close();
                 }
+
+                selection += String.format(" and %s=%d", TaskProvider.KEY_PERCENTDONE, 100);
+                cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    uncompletedSubTaskCount = subTaskCount - cursor.getLong(0);
+                    cursor.close();
+                }
+
+                values.clear();
+                values.put(TaskProvider.KEY_SUBTASK_COUNT, subTaskCount);
+                values.put(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT, uncompletedSubTaskCount);
+                resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(mParentId)), values, null, null);
             }
 
             return null;

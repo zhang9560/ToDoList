@@ -79,11 +79,11 @@ public class TaskTreeAdapter extends CursorAdapter implements CheckBox.OnClickLi
             holder.title.setText(title);
             holder.tags.setText(cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));
 
-            int doneSubTaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_DONE_SUBTASK_COUNT));
+            int uncompletedSubTaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT));
             int subtaskCount = cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_SUBTASK_COUNT));
 
             if (subtaskCount > 0 && mShowSubtaskCount) {
-                holder.subtaskCount.setText(String.format("(%d / %d)", doneSubTaskCount, subtaskCount));
+                holder.subtaskCount.setText(String.format("(%d / %d)", subtaskCount - uncompletedSubTaskCount, subtaskCount));
             }
 
             double dateTime = cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE));
