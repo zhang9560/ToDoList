@@ -96,7 +96,38 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         return mIsArchiveMode;
     }
 
-    public void completeTask(long taskId, long parentId, boolean done) {
+    public void addTask(Uri uri, ContentValues values) {
+        ContentResolver resolver = getContentResolver();
+        long parentId = values.getAsLong(TaskProvider.KEY_PARENT_ID);
+
+        if (resolver.insert(uri, values) != null && parentId > 0) {
+            // Update subtask count of new task's parent.
+            // Top level tasks have no parents, so needn't update when adding a top level task.
+            long subTaskCount = 0;
+            long uncompletedSubTaskCount = 0;
+            String[] projection = {"count(*)"};
+            String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, parentId);
+            Cursor cursor = resolver.query(uri, projection, selection, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                subTaskCount = cursor.getLong(0);
+                cursor.close();
+            }
+
+            selection += String.format(" and %s=%d", TaskProvider.KEY_PERCENTDONE, 100);
+            cursor = resolver.query(uri, projection, selection, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                uncompletedSubTaskCount = subTaskCount - cursor.getLong(0);
+                cursor.close();
+            }
+
+            ContentValues updateValues = new ContentValues();
+            updateValues.put(TaskProvider.KEY_SUBTASK_COUNT, subTaskCount);
+            updateValues.put(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT, uncompletedSubTaskCount);
+            resolver.update(Uri.withAppendedPath(uri, String.valueOf(parentId)), updateValues, null, null);
+        }
+    }
+
+    public void completeTask(Uri uri, long taskId, long parentId, boolean done) {
         ContentResolver resolver = getContentResolver();
         ContentValues values = new ContentValues();
         double now = new JOleDateTime().getDateTime();
@@ -105,13 +136,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         values.put(TaskProvider.KEY_DONE_DATE, done ? now : 0);
         values.put(TaskProvider.KEY_LAST_MOD, now);
 
-        if (resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), values, null, null) > 0) {
-           updateSubTaskCount(parentId);
+        if (resolver.update(Uri.withAppendedPath(uri, String.valueOf(taskId)), values, null, null) > 0) {
+           updateSubTaskCount(uri, parentId);
         }
 
         if (done) {
             // Complete all subtasks.
-            ArrayList<Long> subTaskIds = getSubTaskIds(taskId);
+            ArrayList<Long> subTaskIds = getSubTaskIds(uri, taskId);
 
             if (subTaskIds.size() > 0) {
                 String selection = TaskProvider.KEY_ID + " in (";
@@ -122,21 +153,21 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
                 selection = selection + taskId + ")";
 
                 values.put(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT, 0);
-                resolver.update(TaskProvider.TASK_URI, values, selection, null);
+                resolver.update(uri, values, selection, null);
             }
         }
     }
 
-    public void deleteTask(long taskId, long parentId) {
+    public void deleteTask(Uri uri, long taskId, long parentId) {
         ContentResolver resolver = getContentResolver();
 
         // Delete the task pointed by the taskId, and update its parent's subtask count.
-        if (resolver.delete(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(taskId)), null, null) > 0) {
-            updateSubTaskCount(parentId);
+        if (resolver.delete(Uri.withAppendedPath(uri, String.valueOf(taskId)), null, null) > 0) {
+            updateSubTaskCount(uri, parentId);
         }
 
         // Delete all subtasks of the deleted task.
-        ArrayList<Long> subTaskIds = getSubTaskIds(taskId);
+        ArrayList<Long> subTaskIds = getSubTaskIds(uri, taskId);
 
         if (subTaskIds.size() > 0) {
             String selection = TaskProvider.KEY_ID + " in (";
@@ -147,25 +178,57 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
             selection = selection.substring(0, selection.length() - 2);
             selection += ")";
 
-            resolver.delete(TaskProvider.TASK_URI, selection, null);
+            resolver.delete(uri, selection, null);
         }
     }
 
     public void archiveTask(long taskId, long parentId) {
         ArrayList<Long> list;
+        ContentResolver resolver = getContentResolver();
+        Cursor cursor;
+        ContentValues values = new ContentValues();
+        String[] projection = {TaskProvider.KEY_ID};
 
-        // Copy parents of taskId into archive table.
-        list = getParentIds(taskId);
-        if (list.size() > 0) {
+        // Copy taskId, its parents and children into archive table.
+        list = getParentIds(TaskProvider.TASK_URI, taskId);
+        list.add(taskId);
+        list.addAll(getSubTaskIds(TaskProvider.TASK_URI, taskId));
 
+        for (int i = 0; i < list.size(); i++) {
+            // If the task exists in archive table, do not add it.
+            cursor = resolver.query(Uri.withAppendedPath(TaskProvider.ARCHIVE_URI, String.valueOf(list.get(i))), projection, null, null, null);
+            if (cursor.getCount() == 0) {
+                cursor.close();
+
+                cursor = resolver.query(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(list.get(i))), null, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    values.put(TaskProvider.KEY_ID, cursor.getLong(cursor.getColumnIndex(TaskProvider.KEY_ID)));
+                    values.put(TaskProvider.KEY_TITLE, cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TITLE)));
+                    values.put(TaskProvider.KEY_COMMENTS, cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_COMMENTS)));
+                    values.put(TaskProvider.KEY_COMMENT_STYLE, cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_COMMENT_STYLE)));
+                    values.put(TaskProvider.KEY_CUSTOM_COMMENTS, cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_CUSTOM_COMMENTS)));
+                    values.put(TaskProvider.KEY_PRIORITY, cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PRIORITY)));
+                    values.put(TaskProvider.KEY_PERCENTDONE, cursor.getInt(cursor.getColumnIndex(TaskProvider.KEY_PERCENTDONE)));
+                    values.put(TaskProvider.KEY_CREATION_DATE, cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_CREATION_DATE)));
+                    values.put(TaskProvider.KEY_LAST_MOD, cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_LAST_MOD)));
+                    values.put(TaskProvider.KEY_START_DATE, cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_START_DATE)));
+                    values.put(TaskProvider.KEY_DUE_DATE, cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DUE_DATE)));
+                    values.put(TaskProvider.KEY_DONE_DATE, cursor.getDouble(cursor.getColumnIndex(TaskProvider.KEY_DONE_DATE)));
+                    values.put(TaskProvider.KEY_PARENT_ID, cursor.getLong(cursor.getColumnIndex(TaskProvider.KEY_PARENT_ID)));
+                    values.put(TaskProvider.KEY_TAGS, cursor.getString(cursor.getColumnIndex(TaskProvider.KEY_TAGS)));
+                    values.put(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT, 0);
+                    values.put(TaskProvider.KEY_SUBTASK_COUNT, 0);
+                    cursor.close();
+                    addTask(TaskProvider.ARCHIVE_URI, values);
+                }
+            }
         }
 
-        // Copy taskId and its children into archive table.
-
         // Delete taskId and its children from tasks table.
+        deleteTask(TaskProvider.TASK_URI, taskId, parentId);
     }
 
-    private void updateSubTaskCount(long parentId) {
+    private void updateSubTaskCount(Uri uri, long parentId) {
         // Top level tasks have no parents, so needn't update when updating a top level task.
         if (parentId > 0) {
             ContentResolver resolver = getContentResolver();
@@ -174,14 +237,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
 
             String[] projection = {"count(*)"};
             String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, parentId);
-            Cursor cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+            Cursor cursor = resolver.query(uri, projection, selection, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 subTaskCount = cursor.getLong(0);
                 cursor.close();
             }
 
             selection += String.format(" and %s=%d", TaskProvider.KEY_PERCENTDONE, 100);
-            cursor = resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+            cursor = resolver.query(uri, projection, selection, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 uncompletedSubTaskCount = subTaskCount - cursor.getLong(0);
                 cursor.close();
@@ -190,12 +253,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
             ContentValues values = new ContentValues();
             values.put(TaskProvider.KEY_SUBTASK_COUNT, subTaskCount);
             values.put(TaskProvider.KEY_UNCOMPLETED_SUBTASK_COUNT, uncompletedSubTaskCount);
-            resolver.update(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(parentId)), values, null, null);
+            resolver.update(Uri.withAppendedPath(uri, String.valueOf(parentId)), values, null, null);
         }
     }
 
     // Parents are in the lower position, and children are in the higher position.
-    private ArrayList<Long> getParentIds(long taskId) {
+    private ArrayList<Long> getParentIds(Uri uri, long taskId) {
         String[] projection = {TaskProvider.KEY_PARENT_ID};
         ContentResolver resolver = getContentResolver();
         Cursor cursor;
@@ -204,7 +267,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         parentIds.add(taskId);
 
         while (true) {
-            cursor = resolver.query(Uri.withAppendedPath(TaskProvider.TASK_URI, String.valueOf(parentIds.get(0))), projection, null, null, null);
+            cursor = resolver.query(Uri.withAppendedPath(uri, String.valueOf(parentIds.get(0))), projection, null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 long parentId = cursor.getLong(0);
                 cursor.close();
@@ -223,7 +286,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
     }
 
     // The ArrayList is like a tree, parents in the lower position, and children in the higher position.
-    private ArrayList<Long> getSubTaskIds(long taskId) {
+    private ArrayList<Long> getSubTaskIds(Uri uri, long taskId) {
         String[] projection = {TaskProvider.KEY_ID};
         ContentResolver resolver = getContentResolver();
         Cursor cursor;
@@ -236,7 +299,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
         while (temp.size() > 0) {
             for (long id : temp) {
                 String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID, id);
-                cursor =  resolver.query(TaskProvider.TASK_URI, projection, selection, null, null);
+                cursor =  resolver.query(uri, projection, selection, null, null);
                 if (cursor != null) {
                     while (cursor.moveToNext()) {
                         long subTaskId = cursor.getLong(0);
@@ -259,5 +322,5 @@ public class MainActivity extends Activity implements ActionBar.TabListener, Vie
 
     private ViewPager mViewPager;
     private ActionBar mActionBar;
-    private boolean mIsArchiveMode;
+    private boolean mIsArchiveMode = false;
 }

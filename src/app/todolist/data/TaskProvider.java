@@ -32,7 +32,6 @@ public class TaskProvider extends ContentProvider {
     public static final String KEY_START_DATE = "STARTDATE";
     public static final String KEY_DUE_DATE = "DUEDATE";
     public static final String KEY_DONE_DATE = "DONEDATE";
-    public static final String KEY_LIST_ID = "LISTID";
     public static final String KEY_PARENT_ID = "PARENTID";
     public static final String KEY_TAGS = "TAGS";
     public static final String KEY_SUBTASK_COUNT = "SUBTASKCOUNT";
@@ -85,7 +84,6 @@ public class TaskProvider extends ContentProvider {
             "STARTDATE real, " +
             "DUEDATE real, " +
             "DONEDATE real, " +
-            "LISTID integer, " +
             "PARENTID integer, " +
             "TAGS text, " +
             "UNCOMPLETEDSUBTASKCOUNT integer, " +
@@ -94,7 +92,7 @@ public class TaskProvider extends ContentProvider {
     private static final String CREATE_ARCHIVE_TABLE = "create table " +
             "archive " +
             "(" +
-            "_id integer, " +
+            "_id integer primary key, " +
             "TITLE text, " +
             "COMMENTS text, " +
             "COMMENTSTYLE text, " +
@@ -106,7 +104,6 @@ public class TaskProvider extends ContentProvider {
             "STARTDATE real, " +
             "DUEDATE real, " +
             "DONEDATE real, " +
-            "LISTID integer, " +
             "PARENTID integer, " +
             "TAGS text, " +
             "UNCOMPLETEDSUBTASKCOUNT integer, " +
@@ -171,6 +168,11 @@ public class TaskProvider extends ContentProvider {
             case TASKS:
                 qBuilder.setTables(TASKS_TABLE);
                 break;
+            case ARCHIVE_TASK_ID:
+                qBuilder.appendWhere(KEY_ID + "=" + uri.getLastPathSegment());
+            case ARCHIVE:
+                qBuilder.setTables(ARCHIVE_TABLE);
+                break;
             case LIST_ID:
                 qBuilder.appendWhere(KEY_ID + "=" + uri.getLastPathSegment());
             case LISTS:
@@ -208,6 +210,9 @@ public class TaskProvider extends ContentProvider {
             case TASKS:
                 table = TASKS_TABLE;
                 break;
+            case ARCHIVE:
+                table = ARCHIVE_TABLE;
+                break;
             case LISTS:
                 table = LISTS_TABLE;
                 break;
@@ -240,6 +245,11 @@ public class TaskProvider extends ContentProvider {
             case TASKS:
                 table = TASKS_TABLE;
                 break;
+            case ARCHIVE_TASK_ID:
+                whereClause = KEY_ID + "=" + uri.getLastPathSegment();
+            case ARCHIVE:
+                table = ARCHIVE_TABLE;
+                break;
             case LIST_ID:
                 whereClause = KEY_ID + "=" + uri.getLastPathSegment();
             case LISTS:
@@ -270,6 +280,11 @@ public class TaskProvider extends ContentProvider {
                 whereClause = KEY_ID + "=" + uri.getLastPathSegment();
             case TASKS:
                 table = TASKS_TABLE;
+                break;
+            case ARCHIVE_TASK_ID:
+                whereClause = KEY_ID + "=" + uri.getLastPathSegment();
+            case ARCHIVE:
+                table = ARCHIVE_TABLE;
                 break;
             case LIST_ID:
                 whereClause = KEY_ID + "=" + uri.getLastPathSegment();

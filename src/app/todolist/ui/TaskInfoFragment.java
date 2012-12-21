@@ -155,7 +155,6 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener, 
         }
 
         values.put(TaskProvider.KEY_TAGS, mTags.getEditableText().toString());
-        values.put(TaskProvider.KEY_LIST_ID, 1);
         values.put(TaskProvider.KEY_DUE_DATE, mDueDate);
         values.put(TaskProvider.KEY_START_DATE, mStartDate);
         values.put(TaskProvider.KEY_CREATION_DATE, mCreationDate);

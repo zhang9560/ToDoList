@@ -8,6 +8,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,13 +40,14 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
         protected Void doInBackground(Long... params) {
             int contextMenuId = params[0].intValue();
             long taskId = params[1];
+            Uri uri = mActivity.getIsArchiveMode() ? TaskProvider.ARCHIVE_URI : TaskProvider.TASK_URI;
 
             switch (contextMenuId) {
                 case R.id.complete_task:
-                    mActivity.completeTask(taskId, mParentIdStack.peek(), params[2] == 1L);
+                    mActivity.completeTask(uri, taskId, mParentIdStack.peek(), params[2] == 1L);
                     break;
                 case R.id.delete_task:
-                    mActivity.deleteTask(taskId, mParentIdStack.peek());
+                    mActivity.deleteTask(uri, taskId, mParentIdStack.peek());
                     break;
                 case R.id.archive_task:
                     mActivity.archiveTask(taskId, mParentIdStack.peek());
@@ -134,8 +136,11 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
                 startActivityForResult(intent, 0);
                 break;
             case R.id.main_activity_menu_switch_list:
-                boolean isArchiveMode = mActivity.getIsArchiveMode();
-                mActivity.setIsArchiveMode(!isArchiveMode);
+                // Go back to top level.
+                mParentIdStack.clear();
+                mParentIdStack.push(0L);
+                mActivity.setIsArchiveMode(!mActivity.getIsArchiveMode());
+                refreshTaskTree();
                 mActivity.invalidateOptionsMenu();
                 break;
         }
@@ -153,7 +158,7 @@ public class TaskTreeFragment extends ListFragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String selection = String.format("%s=%d", TaskProvider.KEY_PARENT_ID,  mParentIdStack.peek());
-        return new CursorLoader(mActivity, TaskProvider.TASK_URI, null, selection, null, null);
+        return new CursorLoader(mActivity, mActivity.getIsArchiveMode() ? TaskProvider.ARCHIVE_URI : TaskProvider.TASK_URI, null, selection, null, null);
     }
 
     @Override
